@@ -13,13 +13,21 @@ The Iranian regime has imposed a severe internet shutdown across the country whi
 - Arbitrary arrests and detentions of activists, journalists, and ordinary citizens
 - The world needs to know what is happening and put pressure on the regime
 
-## Key Hashtags
-- #MahsaAmini - The young woman whose death sparked the protests
+## Key Hashtags (pick 1-2 relevant ones)
+- #MahsaAmini - The young woman whose death sparked the 2022 protests
 - #IranProtests - General protest coverage
-- #WomanLifeFreedom - The movement's main slogan (Zan, Zendegi, Azadi)
+- #WomanLifeFreedom - The movement's main slogan
+- #ZanZendegiAzadi - Woman Life Freedom in Persian
 - #IranRevolution - The ongoing revolution
+- #FreeIran - Call for freedom
 - #OpIran - Internet freedom operations
+- #IRGCTerrorists - Designate IRGC as terrorists
+- #StopExecutionsInIran - Against executions
+- #IraniansWantRegimeChange - Political change
 - #SayTheirNames - Remembering those killed
+- #Tehran - Capital city protests
+- #InternetShutdown - Against blackouts
+- #BeOurVoice - Call for international support
 
 ## Tone Guidelines
 - Urgent but not alarmist
