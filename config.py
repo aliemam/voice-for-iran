@@ -16,7 +16,6 @@ DB_PATH = os.path.join(os.path.dirname(__file__), "data", "usage.db")
 # Supported output languages
 LANGUAGES = {
     "en": "English",
-    "fa": "فارسی",
     "nl": "Nederlands",
     "ar": "العربية",
     "fr": "Français",
