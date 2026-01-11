@@ -132,6 +132,14 @@ TARGETS = {
         },
     ],
     "politicians": [
+        {
+            "name": "Donald Trump",
+            "handle": "realDonaldTrump",
+            "category": "politician",
+            "description": "47th US President, massive influence and platform",
+            "tone": "Direct, appeal to his stance against Iran regime, mention freedom",
+            "instagram": "realdonaldtrump",
+        },
         # Israeli Leaders
         {
             "name": "Benjamin Netanyahu",
