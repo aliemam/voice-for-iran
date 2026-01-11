@@ -42,45 +42,53 @@ def create_twitter_intent_url(text: str) -> str:
     return f"https://twitter.com/intent/tweet?text={encoded_text}"
 
 
-async def validate_twitter_handle(handle: str) -> bool:
-    """Check if a Twitter handle exists by trying to fetch the profile."""
+def is_valid_handle_format(handle: str) -> bool:
+    """Check if a Twitter handle has valid format (don't verify existence - Twitter blocks requests)."""
     handle = handle.lstrip("@")
-    try:
-        async with httpx.AsyncClient() as client:
-            response = await client.head(
-                f"https://twitter.com/{handle}",
-                follow_redirects=True,
-                timeout=10.0
-            )
-            return response.status_code == 200
-    except Exception:
-        return False
+    return bool(re.match(r"^[a-zA-Z0-9_]{1,15}$", handle))
 
 
 async def search_twitter_handle(name: str) -> list:
-    """Search for Twitter handles by name using web search."""
-    # This is a simple implementation - returns suggestions based on common patterns
-    # In production, you'd want to use Twitter API or a proper search service
+    """Search for Twitter handles using DuckDuckGo."""
     suggestions = []
+    try:
+        async with httpx.AsyncClient() as client:
+            # Search DuckDuckGo for Twitter profile
+            response = await client.get(
+                "https://api.duckduckgo.com/",
+                params={
+                    "q": f"{name} twitter",
+                    "format": "json",
+                    "no_html": 1,
+                },
+                timeout=10.0
+            )
+            if response.status_code == 200:
+                data = response.json()
+                # Look for Twitter URLs in results
+                text = str(data)
+                # Find twitter.com/username patterns
+                import re as regex
+                matches = regex.findall(r'twitter\.com/([a-zA-Z0-9_]{1,15})', text)
+                for match in matches:
+                    if match.lower() not in ['intent', 'share', 'home', 'search', 'i', 'hashtag']:
+                        if match not in suggestions:
+                            suggestions.append(match)
+                        if len(suggestions) >= 3:
+                            break
+    except Exception as e:
+        logger.error(f"Search error: {e}")
 
-    # Clean the name
-    name_clean = name.lower().replace(" ", "")
-    name_parts = name.lower().split()
+    # If no results from search, generate suggestions from name
+    if not suggestions:
+        name_clean = name.lower().replace(" ", "")
+        name_parts = name.lower().split()
+        possible = [name_clean, "_".join(name_parts)]
+        for handle in possible:
+            if is_valid_handle_format(handle) and handle not in suggestions:
+                suggestions.append(handle)
 
-    # Generate possible handles
-    possible = [
-        name_clean,
-        "".join(name_parts),
-        "_".join(name_parts),
-        name_parts[0] if name_parts else name_clean,
-    ]
-
-    # Check each possibility
-    for handle in possible[:3]:
-        if await validate_twitter_handle(handle):
-            suggestions.append(handle)
-
-    return suggestions
+    return suggestions[:3]
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -118,59 +126,47 @@ async def handle_text_message(update: Update, context: ContextTypes.DEFAULT_TYPE
         handle = text.lstrip("@")
 
         # Validate handle format
-        if not re.match(r"^[a-zA-Z0-9_]{1,15}$", handle):
+        if not is_valid_handle_format(handle):
             await update.message.reply_text(
                 "فرمت نام کاربری اشتباه است. نام کاربری توییتر باید:\n"
                 "- حداکثر ۱۵ کاراکتر باشد\n"
                 "- فقط شامل حروف، اعداد و _ باشد\n\n"
-                "لطفاً دوباره تلاش کنید یا نام شخص را بنویسید تا جستجو کنم:"
+                "لطفاً دوباره تلاش کنید:"
             )
-            context.user_data["state"] = STATE_WAITING_SEARCH_NAME
             return
 
-        # Check if handle exists
-        await update.message.reply_text("در حال بررسی...")
+        # Valid format - add to selected targets
+        target = {
+            "name": f"@{handle}",
+            "handle": handle,
+            "category": "custom",
+            "description": "Custom target entered by user",
+            "tone": "respectful and urgent",
+        }
 
-        if await validate_twitter_handle(handle):
-            # Valid handle - add to selected targets
-            target = {
-                "name": f"@{handle}",
-                "handle": handle,
-                "category": "custom",
-                "description": "Custom target entered by user",
-                "tone": "respectful and urgent",
-            }
+        selected = context.user_data.get("selected_targets", [])
+        if not any(t["handle"] == handle for t in selected):
+            selected.append(target)
+            context.user_data["selected_targets"] = selected
 
-            selected = context.user_data.get("selected_targets", [])
-            if not any(t["handle"] == handle for t in selected):
-                selected.append(target)
-                context.user_data["selected_targets"] = selected
+        context.user_data["state"] = STATE_NONE
 
-            context.user_data["state"] = STATE_NONE
+        # Show options: add more or continue
+        keyboard = [
+            [InlineKeyboardButton("افزودن هدف دیگر", callback_data="add_more_targets")],
+            [InlineKeyboardButton(f"ادامه با {len(selected)} هدف", callback_data="continue_to_language")],
+        ]
 
-            # Show options: add more or continue
-            keyboard = [
-                [InlineKeyboardButton("افزودن هدف دیگر", callback_data="add_more_targets")],
-                [InlineKeyboardButton(f"ادامه با {len(selected)} هدف", callback_data="continue_to_language")],
-            ]
-
-            targets_list = "\n".join([f"• @{t['handle']}" for t in selected])
-            await update.message.reply_text(
-                f"@{handle} اضافه شد!\n\n"
-                f"اهداف انتخاب شده:\n{targets_list}\n\n"
-                "می‌خواهید هدف دیگری اضافه کنید؟",
-                reply_markup=InlineKeyboardMarkup(keyboard),
-            )
-        else:
-            # Invalid handle - offer to search
-            await update.message.reply_text(
-                f"@{handle} پیدا نشد.\n\n"
-                "نام کامل شخص یا سازمان را بنویسید تا برایتان جستجو کنم:"
-            )
-            context.user_data["state"] = STATE_WAITING_SEARCH_NAME
+        targets_list = "\n".join([f"• @{t['handle']}" for t in selected])
+        await update.message.reply_text(
+            f"@{handle} اضافه شد!\n\n"
+            f"اهداف انتخاب شده:\n{targets_list}\n\n"
+            "می‌خواهید هدف دیگری اضافه کنید؟",
+            reply_markup=InlineKeyboardMarkup(keyboard),
+        )
 
     elif state == STATE_WAITING_SEARCH_NAME:
-        # User wants us to search for a handle
+        # User entered a name, search for handles
         await update.message.reply_text("در حال جستجو...")
 
         suggestions = await search_twitter_handle(text)
@@ -185,7 +181,7 @@ async def handle_text_message(update: Update, context: ContextTypes.DEFAULT_TYPE
             keyboard.append([InlineKeyboardButton(UI["back"], callback_data="back_to_category")])
 
             await update.message.reply_text(
-                f"این نتایج را برای «{text}» پیدا کردم:",
+                f"نتایج جستجو برای «{text}»:",
                 reply_markup=InlineKeyboardMarkup(keyboard),
             )
         else:
@@ -194,8 +190,7 @@ async def handle_text_message(update: Update, context: ContextTypes.DEFAULT_TYPE
                 [InlineKeyboardButton(UI["back"], callback_data="back_to_category")],
             ]
             await update.message.reply_text(
-                "متأسفانه نتیجه‌ای پیدا نشد.\n"
-                "می‌توانید نام کاربری را مستقیم وارد کنید:",
+                "نتیجه‌ای پیدا نشد. لطفاً نام کاربری را مستقیم وارد کنید:",
                 reply_markup=InlineKeyboardMarkup(keyboard),
             )
 
