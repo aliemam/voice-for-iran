@@ -54,6 +54,8 @@ UI = {
     "start_over": "شروع دوباره",
     "error": "متأسفانه خطایی رخ داد. لطفاً دوباره تلاش کنید.",
     "categories": {
+        "trump": "ترامپ",
+        "israeli_leaders": "رهبران اسرائیل",
         "journalists": "روزنامه‌نگاران",
         "politicians": "سیاستمداران",
         "tech_leaders": "رهبران فناوری",
