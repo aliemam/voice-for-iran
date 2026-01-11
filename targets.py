@@ -7,16 +7,6 @@ import random
 from typing import Optional
 
 TARGETS = {
-    "trump": [
-        {
-            "name": "Donald Trump",
-            "handle": "realDonaldTrump",
-            "category": "trump",
-            "description": "47th US President, massive influence and platform",
-            "tone": "Direct, appeal to his stance against Iran regime, mention freedom",
-            "instagram": "realdonaldtrump",
-        },
-    ],
     "journalists": [
         {
             "name": "Tucker Carlson",
