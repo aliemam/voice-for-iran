@@ -56,7 +56,6 @@ UI = {
     "categories": {
         "journalists": "روزنامه‌نگاران",
         "politicians": "سیاستمداران",
-        "celebrities": "چهره‌های مشهور",
         "tech_leaders": "رهبران فناوری",
         "organizations": "سازمان‌ها",
     },
