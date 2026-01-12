@@ -378,8 +378,14 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         await query.answer()
         log_action(telegram_id=user.id, username=user.username, action="finland_emergency")
 
-        # URL to the email redirect page
-        email_page_url = "https://aemirage.ddns.net/finland-email/"
+        # Build mailto redirect URL with query parameters
+        email_page_base = "https://aliemam.github.io/voice-for-iran/"
+        params = urllib.parse.urlencode({
+            'to': FINLAND_EMAIL_TO,
+            'subject': FINLAND_EMAIL_SUBJECT,
+            'body': FINLAND_EMAIL_TEMPLATE
+        })
+        email_page_url = f"{email_page_base}?{params}"
 
         keyboard = [
             [InlineKeyboardButton("📧 ارسال ایمیل", url=email_page_url)],
