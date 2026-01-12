@@ -46,6 +46,30 @@ def create_instagram_url(handle: str) -> str:
     return f"https://instagram.com/{handle}"
 
 
+def create_gmail_url(to: str, subject: str, body: str) -> str:
+    """Creates a Gmail compose URL with pre-filled content."""
+    encoded_subject = urllib.parse.quote(subject, safe="")
+    encoded_body = urllib.parse.quote(body, safe="")
+    return f"https://mail.google.com/mail/?view=cm&fs=1&to={to}&su={encoded_subject}&body={encoded_body}"
+
+
+# Finland email template
+FINLAND_EMAIL_TEMPLATE = """Vetoomus Iranin Suurlähetystön tapaukseen liittyvien kiinniotettujen vapauttamiseksi.
+
+Islamilainen hallinto on viimeisten 98 tunnin yhteys-blackoutin aikana tappanut tuhansia ihmisiä. Näkemyksemme mukaan toiminta lähetystössä on ollut poliittinen mielenilmaus terroristista hallintoa vastaan, joka tällä hetkellä käyttää väkivaltaa ja toteuttaa massamurhia kansaamme kohtaan.
+
+Suurlähetystö kuuluu Iranin kansalaisille, mutta nykyinen suurlähetystö on islamilaisen hallinnon alaisuudessa toimivien henkilöiden miehittämä. Näiden henkilöiden tehtävänä on valvoa ulkomailla asuvia iranilaisia sekä toteuttaa hallinnon toimeksiantoja, mukaan lukien poliittisia salamurhia.
+
+Tämän taustan vuoksi tapahtunut teko on nähtävä iranilaisessa yhteisössä sankarillisena, isänmaallisena ja ihmisoikeuksia puolustavana tekona. Hirmuhallintoa vastaan ei tulisi olla hiljaa. Islamilaisella hallinnolla ei ole legitimiteettiä johtaa Irania, ja sen suurlähetystö on näin ollen miehitetty/kaapattu alue. Islamilaisen hallinnon lippu ei ole Iranin virallinen lippu, eikä sen tule edustaa iranilaisia ulkomailla.
+
+Kysymme: miten klo 17 aikaan toteutettu rauhanomainen ja ihmishenkiä vaarantamaton teko voidaan tulkita julkisrauhan rikkomiseksi?
+
+Vaadimme Suomen-iranilaisena yhteisönä, että kiinniotetut henkilöt vapautetaan mahdollisimman pian ja että asia käsitellään kaikkien tosiasioiden valossa."""
+
+FINLAND_EMAIL_SUBJECT = "Asia: Vetoomus pidätettyjen vapauttamisesta ja tilanteen oikeasuhtaisesta arvioinnista"
+FINLAND_EMAIL_TO = "viestinta.helsinki@poliisi.fi,pasila.helsinki@poliisi.fi"
+
+
 def is_valid_handle_format(handle: str) -> bool:
     """Check if a Twitter handle has valid format."""
     handle = handle.lstrip("@")
@@ -65,6 +89,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     )
 
     keyboard = [
+        [InlineKeyboardButton(UI["finland_button"], callback_data="finland_emergency")],
         [InlineKeyboardButton(UI["platforms"]["twitter"], callback_data="platform_twitter")],
         [InlineKeyboardButton(UI["platforms"]["instagram"], callback_data="platform_instagram")],
     ]
@@ -337,6 +362,7 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         context.user_data["selected_targets"] = []
 
         keyboard = [
+            [InlineKeyboardButton(UI["finland_button"], callback_data="finland_emergency")],
             [InlineKeyboardButton(UI["platforms"]["twitter"], callback_data="platform_twitter")],
             [InlineKeyboardButton(UI["platforms"]["instagram"], callback_data="platform_instagram")],
         ]
@@ -346,6 +372,116 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
             UI["welcome"] + "\n\n" + UI["select_platform"],
             reply_markup=reply_markup,
         )
+
+    # Finland Emergency - Show explanation
+    elif data == "finland_emergency":
+        await query.answer()
+        log_action(telegram_id=user.id, username=user.username, action="finland_emergency")
+
+        keyboard = [
+            [InlineKeyboardButton(UI["finland_send_button"], callback_data="finland_send_email")],
+            [InlineKeyboardButton(UI["back"], callback_data="back_to_start")],
+        ]
+
+        await query.edit_message_text(
+            f"{UI['finland_title']}\n\n{UI['finland_situation']}\n\n{UI['finland_email_explain']}",
+            reply_markup=InlineKeyboardMarkup(keyboard),
+        )
+
+    # Finland - Generate and send email
+    elif data == "finland_send_email":
+        await query.answer()
+        log_action(telegram_id=user.id, username=user.username, action="finland_send_email")
+
+        # Create Gmail URL with the template
+        gmail_url = create_gmail_url(
+            to=FINLAND_EMAIL_TO,
+            subject=FINLAND_EMAIL_SUBJECT,
+            body=FINLAND_EMAIL_TEMPLATE
+        )
+
+        keyboard = [
+            [InlineKeyboardButton("📧 باز کردن Gmail و ارسال", url=gmail_url)],
+            [InlineKeyboardButton("🔄 ایمیل دیگر بساز", callback_data="finland_regenerate")],
+            [InlineKeyboardButton(UI["back"], callback_data="finland_emergency")],
+            [InlineKeyboardButton(UI["start_over"], callback_data="back_to_start")],
+        ]
+
+        await query.edit_message_text(
+            f"{UI['finland_title']}\n\n"
+            "✅ ایمیل آماده است!\n\n"
+            "روی دکمه زیر کلیک کنید تا Gmail باز شود.\n"
+            "فقط کافیست دکمه Send را بزنید!\n\n"
+            f"📬 گیرندگان:\n{FINLAND_EMAIL_TO.replace(',', chr(10))}",
+            reply_markup=InlineKeyboardMarkup(keyboard),
+        )
+
+    # Finland - Regenerate email with AI
+    elif data == "finland_regenerate":
+        await query.answer()
+        await query.edit_message_text(UI["finland_generating"])
+
+        try:
+            # Generate a unique version using AI
+            from ai_generator import get_generator
+            generator = get_generator()
+
+            prompt = f"""Write a polite, formal email in Finnish to Helsinki Police requesting the release of two Iranian protesters.
+
+The email MUST include ALL of these key points (translate/paraphrase them, don't copy exactly):
+1. The Islamic regime has killed thousands during internet blackout
+2. The embassy action was a political protest against a terrorist regime
+3. The embassy belongs to Iranian people, not the regime
+4. The regime's flag doesn't represent Iranians
+5. This was a peaceful act at 5pm that endangered no one
+6. Request immediate release and fair consideration
+
+Keep the same formal tone but make it unique. Write ONLY the email body in Finnish, no subject line."""
+
+            response = generator.client.messages.create(
+                model=generator.model,
+                max_tokens=1000,
+                messages=[{"role": "user", "content": prompt}],
+            )
+            unique_email = response.content[0].text.strip()
+
+            gmail_url = create_gmail_url(
+                to=FINLAND_EMAIL_TO,
+                subject=FINLAND_EMAIL_SUBJECT,
+                body=unique_email
+            )
+
+            keyboard = [
+                [InlineKeyboardButton("📧 باز کردن Gmail و ارسال", url=gmail_url)],
+                [InlineKeyboardButton("🔄 ایمیل دیگر بساز", callback_data="finland_regenerate")],
+                [InlineKeyboardButton(UI["back"], callback_data="finland_emergency")],
+            ]
+
+            await query.edit_message_text(
+                f"{UI['finland_title']}\n\n"
+                "✅ ایمیل جدید آماده است!\n\n"
+                "روی دکمه زیر کلیک کنید تا Gmail باز شود.\n"
+                "فقط کافیست دکمه Send را بزنید!",
+                reply_markup=InlineKeyboardMarkup(keyboard),
+            )
+        except Exception as e:
+            logger.error(f"Error generating Finland email: {e}")
+            # Fallback to original template
+            gmail_url = create_gmail_url(
+                to=FINLAND_EMAIL_TO,
+                subject=FINLAND_EMAIL_SUBJECT,
+                body=FINLAND_EMAIL_TEMPLATE
+            )
+            keyboard = [
+                [InlineKeyboardButton("📧 باز کردن Gmail و ارسال", url=gmail_url)],
+                [InlineKeyboardButton(UI["back"], callback_data="finland_emergency")],
+            ]
+            await query.edit_message_text(
+                f"{UI['finland_title']}\n\n"
+                "✅ ایمیل آماده است!\n\n"
+                "روی دکمه زیر کلیک کنید.",
+                reply_markup=InlineKeyboardMarkup(keyboard),
+            )
 
 
 async def show_target_selection(query, context: ContextTypes.DEFAULT_TYPE) -> None:
