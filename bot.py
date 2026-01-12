@@ -68,7 +68,7 @@ Vaadimme Suomen-iranilaisena yhteisönä, että kiinniotetut henkilöt vapauteta
 
 FINLAND_EMAIL_SUBJECT = "Asia: Vetoomus pidätettyjen vapauttamisesta ja tilanteen oikeasuhtaisesta arvioinnista"
 FINLAND_EMAIL_TO = "viestinta.helsinki@poliisi.fi"
-FINLAND_EMAIL_CC = "pasila.helsinki@poliisi.fi"
+FINLAND_EMAIL_CC = ""  # Add CC recipient here if needed
 
 
 def is_valid_handle_format(handle: str) -> bool:
@@ -381,12 +381,14 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
 
         # Build mailto redirect URL with query parameters
         email_page_base = "https://aliemam.github.io/voice-for-iran/"
-        params = urllib.parse.urlencode({
+        params_dict = {
             'to': FINLAND_EMAIL_TO,
-            'cc': FINLAND_EMAIL_CC,
             'subject': FINLAND_EMAIL_SUBJECT,
             'body': FINLAND_EMAIL_TEMPLATE
-        })
+        }
+        if FINLAND_EMAIL_CC:
+            params_dict['cc'] = FINLAND_EMAIL_CC
+        params = urllib.parse.urlencode(params_dict)
         email_page_url = f"{email_page_base}?{params}"
 
         keyboard = [
