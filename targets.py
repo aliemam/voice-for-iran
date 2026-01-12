@@ -486,3 +486,18 @@ def get_target_by_handle(handle: str) -> Optional[dict]:
             if target["handle"].lower() == handle.lower():
                 return target
     return None
+
+
+def get_targets_with_instagram(category: str) -> list:
+    """Returns targets in a category that have Instagram handles."""
+    targets = TARGETS.get(category, [])
+    return [t for t in targets if t.get("instagram")]
+
+
+def get_target_by_instagram(handle: str) -> Optional[dict]:
+    """Finds a target by their Instagram handle."""
+    for category_targets in TARGETS.values():
+        for target in category_targets:
+            if target.get("instagram") and target["instagram"].lower() == handle.lower():
+                return target
+    return None
