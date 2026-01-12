@@ -13,12 +13,13 @@ The Iranian regime has imposed a severe internet shutdown across the country whi
 - Arbitrary arrests and detentions of activists, journalists, and ordinary citizens
 - The world needs to know what is happening and put pressure on the regime
 
-## Key Hashtags (pick 1-2 relevant ones)
+## Key Hashtags
+IMPORTANT: Always include #KingRezaPahlavi in every message. Pick 1-2 others:
+- #KingRezaPahlavi - REQUIRED in every message
 - #IranProtests - General protest coverage
 - #FreeIran - Call for freedom
 - #BeOurVoice - Call for international support
-- #جاوید_شاه - Long live the king (Persian)
-- #king_reza_pahlavi - Support for Reza Pahlavi
+- #جاویدشاه - Long live the king (Persian)
 
 ## Tone Guidelines
 - Urgent but not alarmist
@@ -38,13 +39,13 @@ The Iranian regime has imposed a severe internet shutdown across the country whi
 PLATFORM_CONSTRAINTS = {
     "twitter": {
         "max_chars": 280,
-        "format": "Short, punchy, include @mention and 1-2 hashtags",
-        "notes": "Can include links but keep text concise"
+        "format": "Short, punchy, include @mention and hashtags. MUST include #KingRezaPahlavi",
+        "notes": "FREE account limit is 280 chars - DO NOT EXCEED. Include @mention + #KingRezaPahlavi + 1 other hashtag"
     },
     "instagram": {
-        "max_chars": 2200,
-        "format": "Can be longer, more storytelling, use line breaks",
-        "notes": "No clickable links in captions, use hashtags generously"
+        "max_chars": 1000,
+        "format": "For DM/comment. Include hashtags. MUST include #KingRezaPahlavi",
+        "notes": "DM limit is 1000 chars - DO NOT EXCEED. Can be more detailed than Twitter but stay under limit"
     }
 }
 
@@ -116,8 +117,9 @@ Generate a unique {platform} message in **{language_names.get(language, 'English
 ## Output Requirements
 - Write ONLY the message text (no explanations, no quotes around it)
 - Include @{target.get('handle', '')} mention
-- Include 1-2 relevant hashtags
-- Stay within character limit
+- MUST include #KingRezaPahlavi hashtag (REQUIRED)
+- Add 1 other hashtag from the list
+- CRITICAL: Stay UNDER {constraints['max_chars']} characters - count carefully!
 - Make it unique and authentic
 
 Generate the message now:"""
