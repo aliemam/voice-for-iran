@@ -19,7 +19,7 @@ from telegram.ext import (
 )
 
 from config import BOT_TOKEN, LANGUAGES, UI
-from targets import get_categories, get_targets_by_category, get_random_target, get_targets_with_instagram
+from targets import get_all_targets, get_targets_with_instagram, get_random_target, get_target_by_handle
 from ai_generator import generate_tweet, generate_instagram_caption
 from db import init_db, log_action
 
@@ -33,7 +33,6 @@ logger = logging.getLogger(__name__)
 # States for conversation
 STATE_NONE = 0
 STATE_WAITING_CUSTOM_HANDLE = 1
-STATE_WAITING_SEARCH_NAME = 2
 
 
 def create_twitter_intent_url(text: str) -> str:
@@ -48,52 +47,9 @@ def create_instagram_url(handle: str) -> str:
 
 
 def is_valid_handle_format(handle: str) -> bool:
-    """Check if a Twitter handle has valid format (don't verify existence - Twitter blocks requests)."""
+    """Check if a Twitter handle has valid format."""
     handle = handle.lstrip("@")
     return bool(re.match(r"^[a-zA-Z0-9_]{1,15}$", handle))
-
-
-async def search_twitter_handle(name: str) -> list:
-    """Search for Twitter handles using DuckDuckGo."""
-    suggestions = []
-    try:
-        async with httpx.AsyncClient() as client:
-            # Search DuckDuckGo for Twitter profile
-            response = await client.get(
-                "https://api.duckduckgo.com/",
-                params={
-                    "q": f"{name} twitter",
-                    "format": "json",
-                    "no_html": 1,
-                },
-                timeout=10.0
-            )
-            if response.status_code == 200:
-                data = response.json()
-                # Look for Twitter URLs in results
-                text = str(data)
-                # Find twitter.com/username patterns
-                import re as regex
-                matches = regex.findall(r'twitter\.com/([a-zA-Z0-9_]{1,15})', text)
-                for match in matches:
-                    if match.lower() not in ['intent', 'share', 'home', 'search', 'i', 'hashtag']:
-                        if match not in suggestions:
-                            suggestions.append(match)
-                        if len(suggestions) >= 3:
-                            break
-    except Exception as e:
-        logger.error(f"Search error: {e}")
-
-    # If no results from search, generate suggestions from name
-    if not suggestions:
-        name_clean = name.lower().replace(" ", "")
-        name_parts = name.lower().split()
-        possible = [name_clean, "_".join(name_parts)]
-        for handle in possible:
-            if is_valid_handle_format(handle) and handle not in suggestions:
-                suggestions.append(handle)
-
-    return suggestions[:3]
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -144,8 +100,8 @@ async def handle_text_message(update: Update, context: ContextTypes.DEFAULT_TYPE
         target = {
             "name": f"@{handle}",
             "handle": handle,
-            "category": "custom",
-            "description": "Custom target entered by user",
+            "description": "Custom target",
+            "description_fa": "هدف سفارشی",
             "tone": "respectful and urgent",
         }
 
@@ -158,7 +114,7 @@ async def handle_text_message(update: Update, context: ContextTypes.DEFAULT_TYPE
 
         # Show options: add more or continue
         keyboard = [
-            [InlineKeyboardButton("افزودن هدف دیگر", callback_data="add_more_targets")],
+            [InlineKeyboardButton("افزودن هدف دیگر", callback_data="show_targets")],
             [InlineKeyboardButton(f"ادامه با {len(selected)} هدف", callback_data="continue_to_language")],
         ]
 
@@ -170,37 +126,6 @@ async def handle_text_message(update: Update, context: ContextTypes.DEFAULT_TYPE
             reply_markup=InlineKeyboardMarkup(keyboard),
         )
 
-    elif state == STATE_WAITING_SEARCH_NAME:
-        # User entered a name, search for handles
-        await update.message.reply_text("در حال جستجو...")
-
-        suggestions = await search_twitter_handle(text)
-
-        if suggestions:
-            keyboard = []
-            for handle in suggestions:
-                keyboard.append([
-                    InlineKeyboardButton(f"@{handle}", callback_data=f"custom_{handle}")
-                ])
-            keyboard.append([InlineKeyboardButton("وارد کردن دستی", callback_data="enter_custom")])
-            keyboard.append([InlineKeyboardButton(UI["back"], callback_data="back_to_category")])
-
-            await update.message.reply_text(
-                f"نتایج جستجو برای «{text}»:",
-                reply_markup=InlineKeyboardMarkup(keyboard),
-            )
-        else:
-            keyboard = [
-                [InlineKeyboardButton("وارد کردن دستی", callback_data="enter_custom")],
-                [InlineKeyboardButton(UI["back"], callback_data="back_to_category")],
-            ]
-            await update.message.reply_text(
-                "نتیجه‌ای پیدا نشد. لطفاً نام کاربری را مستقیم وارد کنید:",
-                reply_markup=InlineKeyboardMarkup(keyboard),
-            )
-
-        context.user_data["state"] = STATE_NONE
-
 
 async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handles all callback queries from inline keyboards."""
@@ -208,119 +133,33 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     user = update.effective_user
     data = query.data
 
-    # Platform selection
+    # Platform selection - go directly to targets
     if data.startswith("platform_"):
-        platform = data.replace("platform_", "")
-
         await query.answer()
+        platform = data.replace("platform_", "")
         context.user_data["platform"] = platform
         context.user_data["selected_targets"] = []
         log_action(telegram_id=user.id, username=user.username, action="select_platform", platform=platform)
 
-        # Show category selection
-        keyboard = []
-        categories = get_categories()
-        for cat in categories:
-            # For Instagram, check if category has targets with Instagram handles
-            if platform == "instagram":
-                targets_with_ig = get_targets_with_instagram(cat)
-                if not targets_with_ig:
-                    continue  # Skip categories with no Instagram targets
-            keyboard.append([
-                InlineKeyboardButton(
-                    UI["categories"].get(cat, cat),
-                    callback_data=f"category_{cat}"
-                )
-            ])
-        keyboard.append([InlineKeyboardButton(UI["back"], callback_data="back_to_start")])
+        # Show target selection directly
+        await show_target_selection(query, context)
 
-        await query.edit_message_text(
-            UI["select_category"],
-            reply_markup=InlineKeyboardMarkup(keyboard),
-        )
-
-    # Category selection
-    elif data.startswith("category_"):
+    # Show targets (for adding more)
+    elif data == "show_targets":
         await query.answer()
-        category = data.replace("category_", "")
-        context.user_data["category"] = category
-        platform = context.user_data.get("platform", "twitter")
-        log_action(telegram_id=user.id, username=user.username, action="select_category", target_category=category)
-
-        # Show target selection - filter for Instagram if needed
-        if platform == "instagram":
-            targets = get_targets_with_instagram(category)
-        else:
-            targets = get_targets_by_category(category)
-        selected = context.user_data.get("selected_targets", [])
-
-        keyboard = []
-
-        # Add custom handle option (Twitter only - Instagram needs known profiles)
-        if platform == "twitter":
-            keyboard.append([
-                InlineKeyboardButton(
-                    "وارد کردن نام کاربری دلخواه",
-                    callback_data="enter_custom"
-                )
-            ])
-
-            # Add random option
-            keyboard.append([
-                InlineKeyboardButton(
-                    "انتخاب تصادفی",
-                    callback_data="target_random"
-                )
-            ])
-
-        # Show targets with selection indicator
-        for target in targets[:8]:
-            is_selected = any(t["handle"] == target["handle"] for t in selected)
-            prefix = "✓ " if is_selected else ""
-            # Show Instagram handle for Instagram, Twitter handle for Twitter
-            if platform == "instagram":
-                display_handle = target.get("instagram", target["handle"])
-            else:
-                display_handle = target["handle"]
-            keyboard.append([
-                InlineKeyboardButton(
-                    f"{prefix}{target['name']} (@{display_handle})",
-                    callback_data=f"toggle_{target['handle']}"
-                )
-            ])
-
-        # If targets selected, show continue button
-        if selected:
-            keyboard.append([
-                InlineKeyboardButton(
-                    f"ادامه با {len(selected)} هدف انتخاب شده",
-                    callback_data="continue_to_language"
-                )
-            ])
-
-        keyboard.append([InlineKeyboardButton(UI["back"], callback_data=f"platform_{platform}")])
-
-        selected_text = ""
-        if selected:
-            selected_text = f"\n\nانتخاب شده: {len(selected)} هدف"
-
-        await query.edit_message_text(
-            UI["select_target"] + "\n(می‌توانید چند هدف انتخاب کنید)" + selected_text,
-            reply_markup=InlineKeyboardMarkup(keyboard),
-        )
+        await show_target_selection(query, context)
 
     # Toggle target selection (multi-select)
     elif data.startswith("toggle_"):
         await query.answer()
         handle = data.replace("toggle_", "")
-        category = context.user_data.get("category")
         platform = context.user_data.get("platform", "twitter")
 
         # Get targets based on platform
         if platform == "instagram":
-            targets = get_targets_with_instagram(category)
+            targets = get_targets_with_instagram()
         else:
-            targets = get_targets_by_category(category)
+            targets = get_all_targets()
         target = next((t for t in targets if t["handle"] == handle), None)
 
         if target:
@@ -334,303 +173,45 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
 
             context.user_data["selected_targets"] = selected
 
-            # Refresh the target list
-            keyboard = []
+        # Refresh the target list
+        await show_target_selection(query, context)
 
-            # Custom handle option (Twitter only)
-            if platform == "twitter":
-                keyboard.append([
-                    InlineKeyboardButton(
-                        "وارد کردن نام کاربری دلخواه",
-                        callback_data="enter_custom"
-                    )
-                ])
-
-                keyboard.append([
-                    InlineKeyboardButton(
-                        "انتخاب تصادفی",
-                        callback_data="target_random"
-                    )
-                ])
-
-            for t in targets[:8]:
-                is_selected = any(s["handle"] == t["handle"] for s in selected)
-                prefix = "✓ " if is_selected else ""
-                # Show appropriate handle based on platform
-                if platform == "instagram":
-                    display_handle = t.get("instagram", t["handle"])
-                else:
-                    display_handle = t["handle"]
-                keyboard.append([
-                    InlineKeyboardButton(
-                        f"{prefix}{t['name']} (@{display_handle})",
-                        callback_data=f"toggle_{t['handle']}"
-                    )
-                ])
-
-            if selected:
-                keyboard.append([
-                    InlineKeyboardButton(
-                        f"ادامه با {len(selected)} هدف انتخاب شده",
-                        callback_data="continue_to_language"
-                    )
-                ])
-
-            keyboard.append([InlineKeyboardButton(UI["back"], callback_data=f"platform_{platform}")])
-
-            selected_text = ""
-            if selected:
-                selected_text = f"\n\nانتخاب شده: {len(selected)} هدف"
-
-            await query.edit_message_text(
-                UI["select_target"] + "\n(می‌توانید چند هدف انتخاب کنید)" + selected_text,
-                reply_markup=InlineKeyboardMarkup(keyboard),
-            )
-
-    # Enter custom handle
+    # Enter custom handle (Twitter only)
     elif data == "enter_custom":
         await query.answer()
         context.user_data["state"] = STATE_WAITING_CUSTOM_HANDLE
 
-        keyboard = [[InlineKeyboardButton(UI["back"], callback_data=f"category_{context.user_data.get('category', 'journalists')}")]]
+        keyboard = [[InlineKeyboardButton(UI["back"], callback_data="show_targets")]]
 
         await query.edit_message_text(
             "نام کاربری توییتر را وارد کنید:\n"
-            "(مثال: elonmusk یا @elonmusk)\n\n"
-            "اگر نام کاربری را نمی‌دانید، نام شخص را بنویسید تا جستجو کنم.",
+            "(مثال: elonmusk یا @elonmusk)",
             reply_markup=InlineKeyboardMarkup(keyboard),
         )
 
-    # Custom handle from search results
-    elif data.startswith("custom_"):
+    # Random target selection
+    elif data == "target_random":
         await query.answer()
-        handle = data.replace("custom_", "")
+        target = get_random_target()
+        if target:
+            selected = context.user_data.get("selected_targets", [])
+            if not any(t["handle"] == target["handle"] for t in selected):
+                selected.append(target)
+                context.user_data["selected_targets"] = selected
 
-        target = {
-            "name": f"@{handle}",
-            "handle": handle,
-            "category": "custom",
-            "description": "Custom target",
-            "tone": "respectful and urgent",
-        }
-
-        selected = context.user_data.get("selected_targets", [])
-        if not any(t["handle"] == handle for t in selected):
-            selected.append(target)
-            context.user_data["selected_targets"] = selected
-
-        keyboard = [
-            [InlineKeyboardButton("افزودن هدف دیگر", callback_data="add_more_targets")],
-            [InlineKeyboardButton(f"ادامه با {len(selected)} هدف", callback_data="continue_to_language")],
-        ]
-
-        targets_list = "\n".join([f"• @{t['handle']}" for t in selected])
-        await query.edit_message_text(
-            f"@{handle} اضافه شد!\n\n"
-            f"اهداف انتخاب شده:\n{targets_list}\n\n"
-            "می‌خواهید هدف دیگری اضافه کنید؟",
-            reply_markup=InlineKeyboardMarkup(keyboard),
-        )
-
-    # Add more targets
-    elif data == "add_more_targets":
-        await query.answer()
-        category = context.user_data.get("category", "journalists")
-        platform = context.user_data.get("platform", "twitter")
-        context.user_data["category"] = category
-
-        # Get targets based on platform
-        if platform == "instagram":
-            targets = get_targets_with_instagram(category)
-        else:
-            targets = get_targets_by_category(category)
-        selected = context.user_data.get("selected_targets", [])
-
-        keyboard = []
-
-        # Custom handle option (Twitter only)
-        if platform == "twitter":
-            keyboard.append([
-                InlineKeyboardButton(
-                    "وارد کردن نام کاربری دلخواه",
-                    callback_data="enter_custom"
-                )
-            ])
-
-            keyboard.append([
-                InlineKeyboardButton(
-                    "انتخاب تصادفی",
-                    callback_data="target_random"
-                )
-            ])
-
-        for target in targets[:8]:
-            is_selected = any(t["handle"] == target["handle"] for t in selected)
-            prefix = "✓ " if is_selected else ""
-            if platform == "instagram":
-                display_handle = target.get("instagram", target["handle"])
-            else:
-                display_handle = target["handle"]
-            keyboard.append([
-                InlineKeyboardButton(
-                    f"{prefix}{target['name']} (@{display_handle})",
-                    callback_data=f"toggle_{target['handle']}"
-                )
-            ])
-
-        if selected:
-            keyboard.append([
-                InlineKeyboardButton(
-                    f"ادامه با {len(selected)} هدف انتخاب شده",
-                    callback_data="continue_to_language"
-                )
-            ])
-
-        keyboard.append([InlineKeyboardButton(UI["back"], callback_data=f"platform_{platform}")])
-
-        await query.edit_message_text(
-            UI["select_target"] + f"\n\nانتخاب شده: {len(selected)} هدف",
-            reply_markup=InlineKeyboardMarkup(keyboard),
-        )
-
-    # Back to category (from custom input)
-    elif data == "back_to_category":
-        await query.answer()
-        context.user_data["state"] = STATE_NONE
-        category = context.user_data.get("category", "journalists")
-        platform = context.user_data.get("platform", "twitter")
-
-        # Get targets based on platform
-        if platform == "instagram":
-            targets = get_targets_with_instagram(category)
-        else:
-            targets = get_targets_by_category(category)
-        selected = context.user_data.get("selected_targets", [])
-
-        keyboard = []
-
-        # Custom handle option (Twitter only)
-        if platform == "twitter":
-            keyboard.append([
-                InlineKeyboardButton(
-                    "وارد کردن نام کاربری دلخواه",
-                    callback_data="enter_custom"
-                )
-            ])
-
-            keyboard.append([
-                InlineKeyboardButton(
-                    "انتخاب تصادفی",
-                    callback_data="target_random"
-                )
-            ])
-
-        for target in targets[:8]:
-            is_selected = any(t["handle"] == target["handle"] for t in selected)
-            prefix = "✓ " if is_selected else ""
-            if platform == "instagram":
-                display_handle = target.get("instagram", target["handle"])
-            else:
-                display_handle = target["handle"]
-            keyboard.append([
-                InlineKeyboardButton(
-                    f"{prefix}{target['name']} (@{display_handle})",
-                    callback_data=f"toggle_{target['handle']}"
-                )
-            ])
-
-        if selected:
-            keyboard.append([
-                InlineKeyboardButton(
-                    f"ادامه با {len(selected)} هدف انتخاب شده",
-                    callback_data="continue_to_language"
-                )
-            ])
-
-        keyboard.append([InlineKeyboardButton(UI["back"], callback_data=f"platform_{platform}")])
-
-        await query.edit_message_text(
-            UI["select_target"] + "\n(می‌توانید چند هدف انتخاب کنید)",
-            reply_markup=InlineKeyboardMarkup(keyboard),
-        )
+        # Go to language selection
+        await show_language_selection(query, context)
 
     # Continue to language selection
     elif data == "continue_to_language":
         await query.answer()
         selected = context.user_data.get("selected_targets", [])
-        platform = context.user_data.get("platform", "twitter")
 
         if not selected:
             await query.answer("لطفاً حداقل یک هدف انتخاب کنید", show_alert=True)
             return
 
-        # Show language selection
-        keyboard = []
-        row = []
-        for code, name in LANGUAGES.items():
-            row.append(InlineKeyboardButton(name, callback_data=f"lang_{code}"))
-            if len(row) == 2:
-                keyboard.append(row)
-                row = []
-        if row:
-            keyboard.append(row)
-
-        category = context.user_data.get("category", "journalists")
-        keyboard.append([InlineKeyboardButton(UI["back"], callback_data=f"category_{category}")])
-
-        # Show appropriate handles based on platform
-        if platform == "instagram":
-            targets_list = ", ".join([f"@{t.get('instagram', t['handle'])}" for t in selected])
-        else:
-            targets_list = ", ".join([f"@{t['handle']}" for t in selected])
-        await query.edit_message_text(
-            f"اهداف: {targets_list}\n\n{UI['select_language']}",
-            reply_markup=InlineKeyboardMarkup(keyboard),
-        )
-
-    # Single target selection (random or direct) - Twitter only
-    elif data.startswith("target_"):
-        await query.answer()
-        target_id = data.replace("target_", "")
-        platform = context.user_data.get("platform", "twitter")
-
-        if target_id == "random":
-            category = context.user_data.get("category")
-            target = get_random_target(category)
-            if target:
-                selected = context.user_data.get("selected_targets", [])
-                if not any(t["handle"] == target["handle"] for t in selected):
-                    selected.append(target)
-                    context.user_data["selected_targets"] = selected
-
-        # Show language selection
-        selected = context.user_data.get("selected_targets", [])
-        if not selected:
-            await query.answer("خطا در انتخاب هدف", show_alert=True)
-            return
-
-        keyboard = []
-        row = []
-        for code, name in LANGUAGES.items():
-            row.append(InlineKeyboardButton(name, callback_data=f"lang_{code}"))
-            if len(row) == 2:
-                keyboard.append(row)
-                row = []
-        if row:
-            keyboard.append(row)
-
-        category = context.user_data.get("category", "journalists")
-        keyboard.append([InlineKeyboardButton(UI["back"], callback_data=f"category_{category}")])
-
-        # Show appropriate handles based on platform
-        if platform == "instagram":
-            targets_list = ", ".join([f"@{t.get('instagram', t['handle'])}" for t in selected])
-        else:
-            targets_list = ", ".join([f"@{t['handle']}" for t in selected])
-        await query.edit_message_text(
-            f"اهداف: {targets_list}\n\n{UI['select_language']}",
-            reply_markup=InlineKeyboardMarkup(keyboard),
-        )
+        await show_language_selection(query, context)
 
     # Language selection - Generate messages
     elif data.startswith("lang_"):
@@ -651,7 +232,6 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
                 username=user.username,
                 action="generate",
                 target_handle=target["handle"],
-                target_category=target.get("category", "custom"),
                 language=language,
                 platform=platform,
             )
@@ -768,8 +348,102 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         )
 
 
+async def show_target_selection(query, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Shows the target selection screen."""
+    platform = context.user_data.get("platform", "twitter")
+    selected = context.user_data.get("selected_targets", [])
+
+    # Get targets based on platform
+    if platform == "instagram":
+        targets = get_targets_with_instagram()
+    else:
+        targets = get_all_targets()
+
+    keyboard = []
+
+    # Custom handle option (Twitter only)
+    if platform == "twitter":
+        keyboard.append([
+            InlineKeyboardButton(
+                "✏️ وارد کردن نام کاربری دلخواه",
+                callback_data="enter_custom"
+            )
+        ])
+
+    # Show all targets with selection indicator and Persian description
+    for target in targets:
+        is_selected = any(t["handle"] == target["handle"] for t in selected)
+        prefix = "✅ " if is_selected else ""
+
+        # Show appropriate handle based on platform
+        if platform == "instagram":
+            display_handle = target.get("instagram", target["handle"])
+        else:
+            display_handle = target["handle"]
+
+        # Include Persian description
+        desc_fa = target.get("description_fa", "")
+        button_text = f"{prefix}{target['name']}\n{desc_fa}"
+
+        keyboard.append([
+            InlineKeyboardButton(
+                button_text,
+                callback_data=f"toggle_{target['handle']}"
+            )
+        ])
+
+    # If targets selected, show continue button
+    if selected:
+        keyboard.append([
+            InlineKeyboardButton(
+                f"✅ ادامه با {len(selected)} هدف انتخاب شده",
+                callback_data="continue_to_language"
+            )
+        ])
+
+    keyboard.append([InlineKeyboardButton(UI["back"], callback_data="back_to_start")])
+
+    selected_text = ""
+    if selected:
+        selected_text = f"\n\n✅ انتخاب شده: {len(selected)} هدف"
+
+    await query.edit_message_text(
+        UI["select_target"] + "\n(می‌توانید چند هدف انتخاب کنید)" + selected_text,
+        reply_markup=InlineKeyboardMarkup(keyboard),
+    )
+
+
+async def show_language_selection(query, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Shows the language selection screen."""
+    selected = context.user_data.get("selected_targets", [])
+    platform = context.user_data.get("platform", "twitter")
+
+    keyboard = []
+    row = []
+    for code, name in LANGUAGES.items():
+        row.append(InlineKeyboardButton(name, callback_data=f"lang_{code}"))
+        if len(row) == 2:
+            keyboard.append(row)
+            row = []
+    if row:
+        keyboard.append(row)
+
+    keyboard.append([InlineKeyboardButton(UI["back"], callback_data="show_targets")])
+
+    # Show appropriate handles based on platform
+    if platform == "instagram":
+        targets_list = ", ".join([f"@{t.get('instagram', t['handle'])}" for t in selected])
+    else:
+        targets_list = ", ".join([f"@{t['handle']}" for t in selected])
+
+    await query.edit_message_text(
+        f"اهداف: {targets_list}\n\n{UI['select_language']}",
+        reply_markup=InlineKeyboardMarkup(keyboard),
+    )
+
+
 async def show_message(query, context: ContextTypes.DEFAULT_TYPE, index: int) -> None:
-    """Shows a generated message with navigation."""
+    """Shows a generated Twitter message with navigation."""
     messages = context.user_data.get("generated_messages", [])
 
     if not messages:
@@ -793,18 +467,21 @@ async def show_message(query, context: ContextTypes.DEFAULT_TYPE, index: int) ->
     if len(messages) > 1:
         nav_row = []
         if index > 0:
-            nav_row.append(InlineKeyboardButton("قبلی", callback_data="prev_message"))
+            nav_row.append(InlineKeyboardButton("⬅️ قبلی", callback_data="prev_message"))
         nav_row.append(InlineKeyboardButton(f"{index + 1}/{len(messages)}", callback_data="noop"))
         if index < len(messages) - 1:
-            nav_row.append(InlineKeyboardButton("بعدی", callback_data="next_message"))
+            nav_row.append(InlineKeyboardButton("بعدی ➡️", callback_data="next_message"))
         keyboard.append(nav_row)
 
     # Regenerate and start over
     keyboard.append([InlineKeyboardButton(UI["regenerate"], callback_data="regenerate_current")])
     keyboard.append([InlineKeyboardButton(UI["start_over"], callback_data="back_to_start")])
 
+    target_name = target.get("name", f"@{target['handle']}")
+    target_desc = target.get("description_fa", "")
+
     await query.edit_message_text(
-        f"برای @{target['handle']}:\n\n"
+        f"برای {target_name}:\n{target_desc}\n\n"
         f"{UI['tweet_preview']}\n\n{message}\n\n({len(message)} کاراکتر)\n\n"
         f"{UI['customize_note']}",
         reply_markup=InlineKeyboardMarkup(keyboard),
@@ -837,18 +514,21 @@ async def show_instagram_message(query, context: ContextTypes.DEFAULT_TYPE, inde
     if len(messages) > 1:
         nav_row = []
         if index > 0:
-            nav_row.append(InlineKeyboardButton("قبلی", callback_data="prev_message"))
+            nav_row.append(InlineKeyboardButton("⬅️ قبلی", callback_data="prev_message"))
         nav_row.append(InlineKeyboardButton(f"{index + 1}/{len(messages)}", callback_data="noop"))
         if index < len(messages) - 1:
-            nav_row.append(InlineKeyboardButton("بعدی", callback_data="next_message"))
+            nav_row.append(InlineKeyboardButton("بعدی ➡️", callback_data="next_message"))
         keyboard.append(nav_row)
 
     # Regenerate and start over
     keyboard.append([InlineKeyboardButton(UI["regenerate"], callback_data="regenerate_current")])
     keyboard.append([InlineKeyboardButton(UI["start_over"], callback_data="back_to_start")])
 
+    target_name = target.get("name", f"@{instagram_handle}")
+    target_desc = target.get("description_fa", "")
+
     await query.edit_message_text(
-        f"برای @{instagram_handle}:\n\n"
+        f"برای {target_name}:\n{target_desc}\n\n"
         f"{UI['instagram_preview']}\n\n{message}\n\n({len(message)} کاراکتر)\n\n"
         f"{UI['copy_instruction']}",
         reply_markup=InlineKeyboardMarkup(keyboard),
@@ -867,17 +547,10 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 /help - نمایش این راهنما
 
 نحوه استفاده:
-۱. پلتفرم را انتخاب کنید (توییتر)
-۲. دسته‌بندی هدف را انتخاب کنید
-۳. یک یا چند هدف انتخاب کنید
-۴. زبان پیام را انتخاب کنید
-۵. روی دکمه «بزن توییت» کلیک کنید
-۶. در توییتر فقط دکمه Tweet را بزنید!
-
-ویژگی‌ها:
-• انتخاب چند هدف همزمان
-• وارد کردن نام کاربری دلخواه
-• جستجوی خودکار نام کاربری
+۱. پلتفرم را انتخاب کنید (توییتر یا اینستاگرام)
+۲. یک یا چند هدف انتخاب کنید
+۳. زبان پیام را انتخاب کنید
+۴. روی دکمه کلیک کنید!
 
 هر پیام منحصر به فرد است و توسط هوش مصنوعی ساخته می‌شود.
 """
