@@ -373,25 +373,10 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
             reply_markup=reply_markup,
         )
 
-    # Finland Emergency - Show explanation
+    # Finland Emergency - Go directly to Gmail
     elif data == "finland_emergency":
         await query.answer()
         log_action(telegram_id=user.id, username=user.username, action="finland_emergency")
-
-        keyboard = [
-            [InlineKeyboardButton(UI["finland_send_button"], callback_data="finland_send_email")],
-            [InlineKeyboardButton(UI["back"], callback_data="back_to_start")],
-        ]
-
-        await query.edit_message_text(
-            f"{UI['finland_title']}\n\n{UI['finland_situation']}\n\n{UI['finland_email_explain']}",
-            reply_markup=InlineKeyboardMarkup(keyboard),
-        )
-
-    # Finland - Generate and send email
-    elif data == "finland_send_email":
-        await query.answer()
-        log_action(telegram_id=user.id, username=user.username, action="finland_send_email")
 
         # Create Gmail URL with the template
         gmail_url = create_gmail_url(
@@ -403,7 +388,6 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         keyboard = [
             [InlineKeyboardButton("📧 باز کردن Gmail و ارسال", url=gmail_url)],
             [InlineKeyboardButton("🔄 ایمیل دیگر بساز", callback_data="finland_regenerate")],
-            [InlineKeyboardButton(UI["back"], callback_data="finland_emergency")],
             [InlineKeyboardButton(UI["start_over"], callback_data="back_to_start")],
         ]
 
@@ -454,7 +438,7 @@ Keep the same formal tone but make it unique. Write ONLY the email body in Finni
             keyboard = [
                 [InlineKeyboardButton("📧 باز کردن Gmail و ارسال", url=gmail_url)],
                 [InlineKeyboardButton("🔄 ایمیل دیگر بساز", callback_data="finland_regenerate")],
-                [InlineKeyboardButton(UI["back"], callback_data="finland_emergency")],
+                [InlineKeyboardButton(UI["start_over"], callback_data="back_to_start")],
             ]
 
             await query.edit_message_text(
@@ -474,7 +458,7 @@ Keep the same formal tone but make it unique. Write ONLY the email body in Finni
             )
             keyboard = [
                 [InlineKeyboardButton("📧 باز کردن Gmail و ارسال", url=gmail_url)],
-                [InlineKeyboardButton(UI["back"], callback_data="finland_emergency")],
+                [InlineKeyboardButton(UI["start_over"], callback_data="back_to_start")],
             ]
             await query.edit_message_text(
                 f"{UI['finland_title']}\n\n"
