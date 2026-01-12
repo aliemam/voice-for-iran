@@ -46,11 +46,11 @@ def create_instagram_url(handle: str) -> str:
     return f"https://instagram.com/{handle}"
 
 
-def create_gmail_url(to: str, subject: str, body: str) -> str:
-    """Creates a Gmail compose URL with pre-filled content."""
+def create_email_url(to: str, subject: str, body: str) -> str:
+    """Creates a mailto URL that opens the native email app."""
     encoded_subject = urllib.parse.quote(subject, safe="")
     encoded_body = urllib.parse.quote(body, safe="")
-    return f"https://mail.google.com/mail/?view=cm&fs=1&to={to}&su={encoded_subject}&body={encoded_body}"
+    return f"mailto:{to}?subject={encoded_subject}&body={encoded_body}"
 
 
 # Finland email template
@@ -373,30 +373,24 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
             reply_markup=reply_markup,
         )
 
-    # Finland Emergency - Go directly to Gmail
+    # Finland Emergency - Open email page
     elif data == "finland_emergency":
         await query.answer()
         log_action(telegram_id=user.id, username=user.username, action="finland_emergency")
 
-        # Create Gmail URL with the template
-        gmail_url = create_gmail_url(
-            to=FINLAND_EMAIL_TO,
-            subject=FINLAND_EMAIL_SUBJECT,
-            body=FINLAND_EMAIL_TEMPLATE
-        )
+        # URL to the email redirect page
+        email_page_url = "https://aemirage.ddns.net/finland-email/"
 
         keyboard = [
-            [InlineKeyboardButton("📧 باز کردن Gmail و ارسال", url=gmail_url)],
-            [InlineKeyboardButton("🔄 ایمیل دیگر بساز", callback_data="finland_regenerate")],
+            [InlineKeyboardButton("📧 ارسال ایمیل", url=email_page_url)],
             [InlineKeyboardButton(UI["start_over"], callback_data="back_to_start")],
         ]
 
         await query.edit_message_text(
             f"{UI['finland_title']}\n\n"
-            "✅ ایمیل آماده است!\n\n"
-            "روی دکمه زیر کلیک کنید تا Gmail باز شود.\n"
-            "فقط کافیست دکمه Send را بزنید!\n\n"
-            f"📬 گیرندگان:\n{FINLAND_EMAIL_TO.replace(',', chr(10))}",
+            f"{UI['finland_situation']}\n\n"
+            f"{UI['finland_email_explain']}\n\n"
+            "✅ ایمیل آماده است! روی دکمه زیر کلیک کنید:",
             reply_markup=InlineKeyboardMarkup(keyboard),
         )
 
@@ -429,14 +423,14 @@ Keep the same formal tone but make it unique. Write ONLY the email body in Finni
             )
             unique_email = response.content[0].text.strip()
 
-            gmail_url = create_gmail_url(
+            email_url = create_email_url(
                 to=FINLAND_EMAIL_TO,
                 subject=FINLAND_EMAIL_SUBJECT,
                 body=unique_email
             )
 
             keyboard = [
-                [InlineKeyboardButton("📧 باز کردن Gmail و ارسال", url=gmail_url)],
+                [InlineKeyboardButton("📧 ارسال ایمیل", url=email_url)],
                 [InlineKeyboardButton("🔄 ایمیل دیگر بساز", callback_data="finland_regenerate")],
                 [InlineKeyboardButton(UI["start_over"], callback_data="back_to_start")],
             ]
@@ -451,13 +445,13 @@ Keep the same formal tone but make it unique. Write ONLY the email body in Finni
         except Exception as e:
             logger.error(f"Error generating Finland email: {e}")
             # Fallback to original template
-            gmail_url = create_gmail_url(
+            email_url = create_email_url(
                 to=FINLAND_EMAIL_TO,
                 subject=FINLAND_EMAIL_SUBJECT,
                 body=FINLAND_EMAIL_TEMPLATE
             )
             keyboard = [
-                [InlineKeyboardButton("📧 باز کردن Gmail و ارسال", url=gmail_url)],
+                [InlineKeyboardButton("📧 ارسال ایمیل", url=email_url)],
                 [InlineKeyboardButton(UI["start_over"], callback_data="back_to_start")],
             ]
             await query.edit_message_text(
