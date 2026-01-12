@@ -53,8 +53,9 @@ def create_email_url(to: str, subject: str, body: str) -> str:
     return f"mailto:{to}?subject={encoded_subject}&body={encoded_body}"
 
 
-# Finland email template
-FINLAND_EMAIL_TEMPLATE = """Vetoomus Iranin Suurlähetystön tapaukseen liittyvien kiinniotettujen vapauttamiseksi.
+# Emergency email campaign - update these for each campaign
+# Current: Finland - Release of arrested protesters
+EMERGENCY_EMAIL_BODY = """Vetoomus Iranin Suurlähetystön tapaukseen liittyvien kiinniotettujen vapauttamiseksi.
 
 Islamilainen hallinto on viimeisten 98 tunnin yhteys-blackoutin aikana tappanut tuhansia ihmisiä. Näkemyksemme mukaan toiminta lähetystössä on ollut poliittinen mielenilmaus terroristista hallintoa vastaan, joka tällä hetkellä käyttää väkivaltaa ja toteuttaa massamurhia kansaamme kohtaan.
 
@@ -66,9 +67,9 @@ Kysymme: miten klo 17 aikaan toteutettu rauhanomainen ja ihmishenkiä vaarantama
 
 Vaadimme Suomen-iranilaisena yhteisönä, että kiinniotetut henkilöt vapautetaan mahdollisimman pian ja että asia käsitellään kaikkien tosiasioiden valossa."""
 
-FINLAND_EMAIL_SUBJECT = "Asia: Vetoomus pidätettyjen vapauttamisesta ja tilanteen oikeasuhtaisesta arvioinnista"
-FINLAND_EMAIL_TO = "viestinta.helsinki@poliisi.fi"
-FINLAND_EMAIL_CC = ""  # Add CC recipient here if needed
+EMERGENCY_EMAIL_SUBJECT = "Asia: Vetoomus pidätettyjen vapauttamisesta ja tilanteen oikeasuhtaisesta arvioinnista"
+EMERGENCY_EMAIL_TO = "viestinta.helsinki@poliisi.fi"
+EMERGENCY_EMAIL_CC = ""  # Add CC recipient here if needed
 
 
 def is_valid_handle_format(handle: str) -> bool:
@@ -382,12 +383,12 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         # Build mailto redirect URL with query parameters
         email_page_base = "https://aliemam.github.io/voice-for-iran/"
         params_dict = {
-            'to': FINLAND_EMAIL_TO,
-            'subject': FINLAND_EMAIL_SUBJECT,
-            'body': FINLAND_EMAIL_TEMPLATE
+            'to': EMERGENCY_EMAIL_TO,
+            'subject': EMERGENCY_EMAIL_SUBJECT,
+            'body': EMERGENCY_EMAIL_BODY
         }
-        if FINLAND_EMAIL_CC:
-            params_dict['cc'] = FINLAND_EMAIL_CC
+        if EMERGENCY_EMAIL_CC:
+            params_dict['cc'] = EMERGENCY_EMAIL_CC
         params = urllib.parse.urlencode(params_dict)
         email_page_url = f"{email_page_base}?{params}"
 
@@ -434,8 +435,8 @@ Keep the same formal tone but make it unique. Write ONLY the email body in Finni
             unique_email = response.content[0].text.strip()
 
             email_url = create_email_url(
-                to=FINLAND_EMAIL_TO,
-                subject=FINLAND_EMAIL_SUBJECT,
+                to=EMERGENCY_EMAIL_TO,
+                subject=EMERGENCY_EMAIL_SUBJECT,
                 body=unique_email
             )
 
@@ -456,9 +457,9 @@ Keep the same formal tone but make it unique. Write ONLY the email body in Finni
             logger.error(f"Error generating Finland email: {e}")
             # Fallback to original template
             email_url = create_email_url(
-                to=FINLAND_EMAIL_TO,
-                subject=FINLAND_EMAIL_SUBJECT,
-                body=FINLAND_EMAIL_TEMPLATE
+                to=EMERGENCY_EMAIL_TO,
+                subject=EMERGENCY_EMAIL_SUBJECT,
+                body=EMERGENCY_EMAIL_BODY
             )
             keyboard = [
                 [InlineKeyboardButton("📧 ارسال ایمیل", url=email_url)],
