@@ -14,12 +14,12 @@ The Iranian regime has imposed a severe internet shutdown across the country whi
 - The world needs to know what is happening and put pressure on the regime
 
 ## Key Hashtags
-IMPORTANT: Always include #KingRezaPahlavi in every message. Pick 1-2 others:
-- #KingRezaPahlavi - REQUIRED in every message
-- #IranProtests - General protest coverage
+IMPORTANT: Always include #IranProtests in every message. Pick 1 other:
+- #IranProtests - REQUIRED in every message
 - #FreeIran - Call for freedom
 - #BeOurVoice - Call for international support
 - #جاویدشاه - Long live the king (Persian)
+- #KingRezaPahlavi - Support for Reza Pahlavi
 
 ## Tone Guidelines
 - Urgent but not alarmist
@@ -39,12 +39,12 @@ IMPORTANT: Always include #KingRezaPahlavi in every message. Pick 1-2 others:
 PLATFORM_CONSTRAINTS = {
     "twitter": {
         "max_chars": 280,
-        "format": "Short, punchy, include @mention and hashtags. MUST include #KingRezaPahlavi",
-        "notes": "FREE account limit is 280 chars - DO NOT EXCEED. Include @mention + #KingRezaPahlavi + 1 other hashtag"
+        "format": "Short, punchy, include @mention and hashtags. MUST include #IranProtests",
+        "notes": "FREE account limit is 280 chars - DO NOT EXCEED. Include @mention + #IranProtests + 1 other hashtag"
     },
     "instagram": {
         "max_chars": 1000,
-        "format": "For DM/comment. Include hashtags. MUST include #KingRezaPahlavi",
+        "format": "For DM/comment. Include hashtags. MUST include #IranProtests",
         "notes": "DM limit is 1000 chars - DO NOT EXCEED. Can be more detailed than Twitter but stay under limit"
     }
 }
@@ -117,7 +117,7 @@ Generate a unique {platform} message in **{language_names.get(language, 'English
 ## Output Requirements
 - Write ONLY the message text (no explanations, no quotes around it)
 - Include @{target.get('handle', '')} mention
-- MUST include #KingRezaPahlavi hashtag (REQUIRED)
+- MUST include #IranProtests hashtag (REQUIRED)
 - Add 1 other hashtag from the list
 - CRITICAL: Stay UNDER {constraints['max_chars']} characters - count carefully!
 - Make it unique and authentic
