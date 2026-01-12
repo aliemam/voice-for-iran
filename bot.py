@@ -67,7 +67,8 @@ Kysymme: miten klo 17 aikaan toteutettu rauhanomainen ja ihmishenkiä vaarantama
 Vaadimme Suomen-iranilaisena yhteisönä, että kiinniotetut henkilöt vapautetaan mahdollisimman pian ja että asia käsitellään kaikkien tosiasioiden valossa."""
 
 FINLAND_EMAIL_SUBJECT = "Asia: Vetoomus pidätettyjen vapauttamisesta ja tilanteen oikeasuhtaisesta arvioinnista"
-FINLAND_EMAIL_TO = "viestinta.helsinki@poliisi.fi,pasila.helsinki@poliisi.fi"
+FINLAND_EMAIL_TO = "viestinta.helsinki@poliisi.fi"
+FINLAND_EMAIL_CC = "pasila.helsinki@poliisi.fi"
 
 
 def is_valid_handle_format(handle: str) -> bool:
@@ -382,6 +383,7 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         email_page_base = "https://aliemam.github.io/voice-for-iran/"
         params = urllib.parse.urlencode({
             'to': FINLAND_EMAIL_TO,
+            'cc': FINLAND_EMAIL_CC,
             'subject': FINLAND_EMAIL_SUBJECT,
             'body': FINLAND_EMAIL_TEMPLATE
         })
