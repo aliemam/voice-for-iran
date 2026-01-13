@@ -5,7 +5,7 @@ Generates unique, personalized messages for social media.
 
 import anthropic
 from config import ANTHROPIC_API_KEY, CLAUDE_MODEL
-from templates import get_system_prompt, get_generation_prompt, get_trump_senator_prompt, get_finland_email_prompt
+from templates import get_system_prompt, get_generation_prompt, get_trump_senator_prompt, get_finland_email_prompt, get_denmark_email_prompt
 
 
 class MessageGenerator:
@@ -157,3 +157,53 @@ Write only in Finnish. Be extremely respectful and formal."""
         raise Exception(f"API Error: {str(e)}")
     except Exception as e:
         raise Exception(f"Error generating email: {str(e)}")
+
+
+def generate_denmark_email() -> tuple:
+    """
+    Generates a unique Denmark emergency email (subject and body).
+
+    Returns:
+        Tuple of (subject, body) - both in Danish
+    """
+    generator = get_generator()
+    subject_prompt, body_prompt = get_denmark_email_prompt()
+
+    system_prompt = """You are helping generate formal email correspondence in Danish (Dansk).
+Your role is to create unique, polite, formal emails for official communication with Danish government authorities.
+Each email must be unique - vary the wording while keeping the same message.
+Write only in Danish. Be extremely respectful and formal."""
+
+    try:
+        # Generate subject
+        subject_response = generator.client.messages.create(
+            model=generator.model,
+            max_tokens=100,
+            system=system_prompt,
+            messages=[{"role": "user", "content": subject_prompt}],
+        )
+        subject = subject_response.content[0].text.strip()
+
+        # Clean up subject
+        if subject.startswith('"') and subject.endswith('"'):
+            subject = subject[1:-1]
+
+        # Generate body
+        body_response = generator.client.messages.create(
+            model=generator.model,
+            max_tokens=1000,
+            system=system_prompt,
+            messages=[{"role": "user", "content": body_prompt}],
+        )
+        body = body_response.content[0].text.strip()
+
+        # Clean up body
+        if body.startswith('"') and body.endswith('"'):
+            body = body[1:-1]
+
+        return subject, body
+
+    except anthropic.APIError as e:
+        raise Exception(f"API Error: {str(e)}")
+    except Exception as e:
+        raise Exception(f"Error generating Denmark email: {str(e)}")

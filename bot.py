@@ -71,6 +71,16 @@ EMERGENCY_EMAIL_SUBJECT = "Vetoomus pidätettyjen vapauttamisesta ja tilanteen o
 EMERGENCY_EMAIL_TO = "viestinta.helsinki@poliisi.fi,Kirjaamo.UM@gov.fi,elina.valtonen@gov.fi"
 EMERGENCY_EMAIL_CC = ""  # Add CC recipient here if needed
 
+# Denmark Emergency - Release of arrested protesters
+DENMARK_EMAIL_BODY = """During the past 98 hours of an internet blackout, the Islamic regime has killed thousands of people. In our view, the action at the embassy was a political protest against a terrorist regime that is currently using violence and carrying out mass killings against our people.
+
+The embassy belongs to the citizens of Iran; however, the current embassy is occupied by individuals operating under the Islamic regime. These individuals are tasked with monitoring Iranians living abroad and carrying out the regime's orders, including political assassinations.
+
+Given this context, the action in question should be seen within the Iranian community as a heroic, patriotic act in defense of human rights. One must not remain silent in the face of tyranny. The Islamic regime has no legitimacy to govern Iran, and its embassy is therefore an occupied or hijacked space. The flag of the Islamic regime is not Iran's official flag and should not represent Iranians abroad."""
+
+DENMARK_EMAIL_SUBJECT = "Appeal for the Release of Those Detained in Connection with the Iranian Embassy Incident"
+DENMARK_EMAIL_TO = "udenrigsminister@um.dk,um@um.dk"
+
 
 def is_valid_handle_format(handle: str) -> bool:
     """Check if a Twitter handle has valid format."""
@@ -92,6 +102,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
     keyboard = [
         [InlineKeyboardButton(UI["finland_button"], callback_data="finland_emergency")],
+        [InlineKeyboardButton(UI["denmark_button"], callback_data="denmark_emergency")],
         [InlineKeyboardButton(UI["platforms"]["twitter"], callback_data="platform_twitter")],
         [InlineKeyboardButton(UI["platforms"]["instagram"], callback_data="platform_instagram")],
     ]
@@ -365,6 +376,7 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
 
         keyboard = [
             [InlineKeyboardButton(UI["finland_button"], callback_data="finland_emergency")],
+            [InlineKeyboardButton(UI["denmark_button"], callback_data="denmark_emergency")],
             [InlineKeyboardButton(UI["platforms"]["twitter"], callback_data="platform_twitter")],
             [InlineKeyboardButton(UI["platforms"]["instagram"], callback_data="platform_instagram")],
         ]
@@ -474,6 +486,112 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
             ]
             await query.edit_message_text(
                 f"{UI['finland_title']}\n\n"
+                "✅ ایمیل آماده است!\n\n"
+                "روی دکمه زیر کلیک کنید.",
+                reply_markup=InlineKeyboardMarkup(keyboard),
+            )
+
+    # Denmark Emergency - Generate unique AI email
+    elif data == "denmark_emergency":
+        await query.answer()
+        log_action(telegram_id=user.id, username=user.username, action="denmark_email", target_handle=DENMARK_EMAIL_TO)
+
+        # Show generating message
+        await query.edit_message_text(
+            f"{UI['denmark_title']}\n\n"
+            f"{UI['denmark_situation']}\n\n"
+            f"{UI['denmark_generating']}"
+        )
+
+        try:
+            # Generate unique email using AI
+            from ai_generator import generate_denmark_email
+            subject, body = generate_denmark_email()
+
+            # Build URL with GitHub Pages redirect
+            email_page_base = "https://aliemam.github.io/voice-for-iran/"
+            bcc_encoded = urllib.parse.quote(DENMARK_EMAIL_TO, safe='')
+            sub_encoded = urllib.parse.quote_plus(subject)
+            body_encoded = urllib.parse.quote_plus(body)
+            email_page_url = f"{email_page_base}?to=&bcc={bcc_encoded}&sub={sub_encoded}&body={body_encoded}"
+
+            keyboard = [
+                [InlineKeyboardButton("📧 ارسال ایمیل", url=email_page_url)],
+                [InlineKeyboardButton("🔄 ایمیل دیگر بساز", callback_data="denmark_regenerate")],
+                [InlineKeyboardButton(UI["start_over"], callback_data="back_to_start")],
+            ]
+
+            await query.edit_message_text(
+                f"{UI['denmark_title']}\n\n"
+                f"{UI['denmark_email_explain']}\n\n"
+                "✅ ایمیل منحصربه‌فرد آماده است! روی دکمه زیر کلیک کنید:",
+                reply_markup=InlineKeyboardMarkup(keyboard),
+            )
+        except Exception as e:
+            logger.error(f"Error generating Denmark email: {e}")
+            # Fallback to static template
+            email_page_base = "https://aliemam.github.io/voice-for-iran/"
+            bcc_encoded = urllib.parse.quote(DENMARK_EMAIL_TO, safe='')
+            sub_encoded = urllib.parse.quote_plus(DENMARK_EMAIL_SUBJECT)
+            body_encoded = urllib.parse.quote_plus(DENMARK_EMAIL_BODY)
+            email_page_url = f"{email_page_base}?to=&bcc={bcc_encoded}&sub={sub_encoded}&body={body_encoded}"
+
+            keyboard = [
+                [InlineKeyboardButton("📧 ارسال ایمیل", url=email_page_url)],
+                [InlineKeyboardButton(UI["start_over"], callback_data="back_to_start")],
+            ]
+
+            await query.edit_message_text(
+                f"{UI['denmark_title']}\n\n"
+                f"{UI['denmark_email_explain']}\n\n"
+                "✅ ایمیل آماده است! روی دکمه زیر کلیک کنید:",
+                reply_markup=InlineKeyboardMarkup(keyboard),
+            )
+
+    # Denmark - Regenerate email with AI
+    elif data == "denmark_regenerate":
+        await query.answer()
+        await query.edit_message_text(UI["denmark_generating"])
+
+        try:
+            # Generate unique email using AI (both subject and body)
+            from ai_generator import generate_denmark_email
+            subject, body = generate_denmark_email()
+
+            # Build URL with GitHub Pages redirect
+            email_page_base = "https://aliemam.github.io/voice-for-iran/"
+            bcc_encoded = urllib.parse.quote(DENMARK_EMAIL_TO, safe='')
+            sub_encoded = urllib.parse.quote_plus(subject)
+            body_encoded = urllib.parse.quote_plus(body)
+            email_page_url = f"{email_page_base}?to=&bcc={bcc_encoded}&sub={sub_encoded}&body={body_encoded}"
+
+            keyboard = [
+                [InlineKeyboardButton("📧 ارسال ایمیل", url=email_page_url)],
+                [InlineKeyboardButton("🔄 ایمیل دیگر بساز", callback_data="denmark_regenerate")],
+                [InlineKeyboardButton(UI["start_over"], callback_data="back_to_start")],
+            ]
+
+            await query.edit_message_text(
+                f"{UI['denmark_title']}\n\n"
+                "✅ ایمیل جدید آماده است!\n\n"
+                "روی دکمه زیر کلیک کنید:",
+                reply_markup=InlineKeyboardMarkup(keyboard),
+            )
+        except Exception as e:
+            logger.error(f"Error generating Denmark email: {e}")
+            # Fallback to static template
+            email_page_base = "https://aliemam.github.io/voice-for-iran/"
+            bcc_encoded = urllib.parse.quote(DENMARK_EMAIL_TO, safe='')
+            sub_encoded = urllib.parse.quote_plus(DENMARK_EMAIL_SUBJECT)
+            body_encoded = urllib.parse.quote_plus(DENMARK_EMAIL_BODY)
+            email_page_url = f"{email_page_base}?to=&bcc={bcc_encoded}&sub={sub_encoded}&body={body_encoded}"
+
+            keyboard = [
+                [InlineKeyboardButton("📧 ارسال ایمیل", url=email_page_url)],
+                [InlineKeyboardButton(UI["start_over"], callback_data="back_to_start")],
+            ]
+            await query.edit_message_text(
+                f"{UI['denmark_title']}\n\n"
                 "✅ ایمیل آماده است!\n\n"
                 "روی دکمه زیر کلیک کنید.",
                 reply_markup=InlineKeyboardMarkup(keyboard),

@@ -270,3 +270,73 @@ Generate a UNIQUE email body in Finnish requesting the release of the arrested I
 Write ONLY the email body (no quotes, no explanations):"""
 
     return subject_prompt, body_prompt
+
+
+# Denmark Emergency Email Template
+DENMARK_EMAIL_CONTEXT = """
+## Context: Denmark Emergency - Release of Arrested Iranian Protesters
+
+Iranian citizens have been arrested by Danish police after protesting at the Iranian embassy in Denmark. This was a peaceful political protest against the terrorist regime that is currently massacring civilians in Iran.
+
+## Key Points to Include (vary the wording each time):
+- During the past 98 hours of internet blackout, the Islamic regime has killed thousands
+- The embassy action was a political protest against a terrorist regime using violence and mass killings
+- The embassy belongs to Iranian citizens, but is occupied by regime operatives
+- These operatives monitor Iranians abroad and carry out regime orders including political assassinations
+- This should be seen as a heroic, patriotic act in defense of human rights
+- One must not remain silent in the face of tyranny
+- The Islamic regime has no legitimacy - the embassy is occupied/hijacked space
+- The regime's flag is not Iran's official flag and should not represent Iranians abroad
+- Request release and fair consideration of the case
+
+## Tone:
+- EXTREMELY polite and respectful (this is to Danish Foreign Ministry)
+- Formal language appropriate for official government correspondence
+- Grateful and humble, not demanding
+- Appeal to human rights and justice
+
+## Language: DANISH (Dansk)
+The entire email MUST be written in Danish. Use formal Danish appropriate for government correspondence.
+"""
+
+
+def get_denmark_email_prompt():
+    """
+    Creates the prompt for generating a unique Denmark emergency email.
+    Returns tuple of (subject_prompt, body_prompt)
+    """
+    subject_prompt = f"""
+{DENMARK_EMAIL_CONTEXT}
+
+## Your Task
+Generate a UNIQUE email subject line in Danish for this petition.
+
+## Requirements:
+- Write in Danish (Dansk)
+- Keep it formal and respectful
+- Should indicate this is an appeal/petition about the embassy incident and detained individuals
+- Vary the wording - don't use the same subject each time
+- Keep it concise (under 100 characters)
+- Base it on this theme: "Appeal for the Release of Those Detained in Connection with the Iranian Embassy Incident"
+
+Write ONLY the subject line in Danish (no quotes, no explanations):"""
+
+    body_prompt = f"""
+{DENMARK_EMAIL_CONTEXT}
+
+## Your Task
+Generate a UNIQUE email body in Danish requesting the release of the arrested Iranian protesters.
+
+## Requirements:
+- Write entirely in Danish (Dansk)
+- Be EXTREMELY polite and formal
+- Include all the key points but vary the wording
+- Make it feel like a genuine, personal appeal
+- About 150-250 words (not too long)
+- End with a respectful closing and thanks
+- Each email should be unique while conveying the same message
+- Vary the opening
+
+Write ONLY the email body in Danish (no quotes, no explanations):"""
+
+    return subject_prompt, body_prompt
