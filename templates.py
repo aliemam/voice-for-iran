@@ -319,17 +319,22 @@ def get_denmark_email_prompt():
 {DENMARK_EMAIL_CONTEXT}
 
 ## Your Task
-Generate a UNIQUE email subject line in Danish for this petition.
+Generate ONE email subject line in Danish for this petition.
 
 ## Requirements:
 - Write in Danish (Dansk)
 - Keep it formal and respectful
-- Should indicate this is an appeal/petition about the embassy incident and detained individuals
-- Vary the wording - don't use the same subject each time
-- Keep it concise (under 100 characters)
-- Base it on this theme: "Appeal for the Release of Those Detained in Connection with the Iranian Embassy Incident"
+- About the embassy incident and detained individuals
+- Under 100 characters
+- Based on: "Appeal for the Release of Those Detained in Connection with the Iranian Embassy Incident"
 
-Write ONLY the subject line in Danish (no quotes, no explanations):"""
+## CRITICAL: Output EXACTLY ONE subject line.
+- Do NOT output multiple options
+- Do NOT number anything
+- Do NOT include explanations
+- Just write ONE single subject line
+
+Output ONE subject line now:"""
 
     body_prompt = f"""
 {DENMARK_EMAIL_CONTEXT}

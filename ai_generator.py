@@ -3,6 +3,7 @@ AI Message Generator using Claude Haiku.
 Generates unique, personalized messages for social media.
 """
 
+import re
 import anthropic
 from config import ANTHROPIC_API_KEY, CLAUDE_MODEL
 from templates import get_system_prompt, get_generation_prompt, get_trump_senator_prompt, get_finland_email_prompt, get_denmark_email_prompt
@@ -132,11 +133,16 @@ Write only in Finnish. Be extremely respectful and formal."""
         )
         subject = subject_response.content[0].text.strip()
 
-        # Clean up subject
+        # Clean up subject - remove quotes, numbered lists, "Asia:" prefix
         if subject.startswith('"') and subject.endswith('"'):
             subject = subject[1:-1]
         if subject.startswith("Asia:"):
             subject = subject[5:].strip()
+        # If AI returned numbered list, take only the first line
+        if '\n' in subject:
+            subject = subject.split('\n')[0]
+        # Remove leading numbers like "1. " or "1) "
+        subject = re.sub(r'^\d+[\.\)]\s*', '', subject)
 
         # Generate body
         body_response = generator.client.messages.create(
@@ -184,9 +190,14 @@ Write only in Danish. Be extremely respectful and formal."""
         )
         subject = subject_response.content[0].text.strip()
 
-        # Clean up subject
+        # Clean up subject - remove quotes and numbered lists
         if subject.startswith('"') and subject.endswith('"'):
             subject = subject[1:-1]
+        # If AI returned numbered list, take only the first line
+        if '\n' in subject:
+            subject = subject.split('\n')[0]
+        # Remove leading numbers like "1. " or "1) "
+        subject = re.sub(r'^\d+[\.\)]\s*', '', subject)
 
         # Generate body
         body_response = generator.client.messages.create(
