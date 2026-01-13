@@ -157,6 +157,16 @@ Write only in Finnish. Be extremely respectful and formal."""
         if body.startswith('"') and body.endswith('"'):
             body = body[1:-1]
 
+        # If AI returned multiple emails, take only the first one
+        for pattern in ['Email 2:', 'Email 3:', 'E-mail 2:', 'Sähköposti 2:', '\n---\n', '\n\n---']:
+            if pattern in body:
+                body = body.split(pattern)[0].strip()
+
+        # Remove "Email 1:" prefix if present
+        body = re.sub(r'^Email\s*\d+:\s*\n?', '', body, flags=re.IGNORECASE)
+        body = re.sub(r'^E-mail\s*\d+:\s*\n?', '', body, flags=re.IGNORECASE)
+        body = re.sub(r'^Sähköposti\s*\d+:\s*\n?', '', body, flags=re.IGNORECASE)
+
         return subject, body
 
     except anthropic.APIError as e:

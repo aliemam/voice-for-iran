@@ -270,7 +270,7 @@ Output ONE subject line now:"""
 {FINLAND_EMAIL_CONTEXT}
 
 ## Your Task
-Generate a UNIQUE email body in Finnish requesting the release of the arrested Iranian protesters.
+Generate ONE SINGLE email body in Finnish requesting the release of the arrested Iranian protesters.
 
 ## Requirements:
 - Write entirely in Finnish (Suomi)
@@ -279,8 +279,13 @@ Generate a UNIQUE email body in Finnish requesting the release of the arrested I
 - Make it feel like a genuine, personal appeal
 - About 150-250 words (not too long)
 - End with a respectful closing and thanks
-- Each email should be unique while conveying the same message
 - Vary the opening - don't always start with "Arvoisa"
+
+## CRITICAL - OUTPUT EXACTLY ONE EMAIL:
+- Do NOT output multiple emails or variations
+- Do NOT number anything (no "Email 1:", "Email 2:", etc.)
+- Do NOT include explanations or options
+- Just write ONE SINGLE email body
 
 ## CRITICAL - NO PLACEHOLDERS:
 - Do NOT use any placeholders like <Name>, <Recipient>, <Signature>, etc.
@@ -288,7 +293,7 @@ Generate a UNIQUE email body in Finnish requesting the release of the arrested I
 - Use generic greetings like "Hyvä vastaanottaja" (Dear recipient)
 - Do NOT include a signature line - the sender will add their own
 
-Write ONLY the email body (no quotes, no explanations):"""
+Write ONLY ONE email body in Finnish (no quotes, no numbering, no explanations):"""
 
     return subject_prompt, body_prompt
 
