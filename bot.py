@@ -375,29 +375,32 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
             reply_markup=reply_markup,
         )
 
-    # Finland Emergency - Open email page
+    # Finland Emergency - Show email with clickable address
     elif data == "finland_emergency":
         await query.answer()
         log_action(telegram_id=user.id, username=user.username, action="finland_emergency")
 
-        # Build mailto redirect URL with query parameters
-        # Use campaign name instead of email (Telegram encodes @ which breaks it)
-        email_page_base = "https://aliemam.github.io/voice-for-iran/"
-        encoded_subject = urllib.parse.quote(EMERGENCY_EMAIL_SUBJECT, safe='')
-        encoded_body = urllib.parse.quote(EMERGENCY_EMAIL_BODY, safe='')
-        email_page_url = f"{email_page_base}?campaign=finland&subject={encoded_subject}&body={encoded_body}"
-
         keyboard = [
-            [InlineKeyboardButton("📧 ارسال ایمیل", url=email_page_url)],
             [InlineKeyboardButton(UI["start_over"], callback_data="back_to_start")],
         ]
 
+        # Show situation and email info
         await query.edit_message_text(
             f"{UI['finland_title']}\n\n"
             f"{UI['finland_situation']}\n\n"
             f"{UI['finland_email_explain']}\n\n"
-            "✅ ایمیل آماده است! روی دکمه زیر کلیک کنید:",
+            "━━━━━━━━━━━━━━━━━━━━\n\n"
+            f"📧 روی ایمیل زیر کلیک کنید:\n{EMERGENCY_EMAIL_TO}\n\n"
+            "👆 بعد از باز شدن Gmail، موضوع و متن را از پیام بعدی کپی کنید.",
             reply_markup=InlineKeyboardMarkup(keyboard),
+        )
+
+        # Send subject and body as separate message for easy copying
+        await context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text=f"📝 موضوع (Subject):\n`{EMERGENCY_EMAIL_SUBJECT}`\n\n"
+                 f"📄 متن ایمیل (Body):\n`{EMERGENCY_EMAIL_BODY}`",
+            parse_mode="Markdown",
         )
 
     # Finland - Regenerate email with AI
