@@ -361,7 +361,7 @@ Output ONE subject line now:"""
 {DENMARK_EMAIL_CONTEXT}
 
 ## Your Task
-Generate a UNIQUE email body in Danish requesting reconsideration of the detention and release.
+Generate ONE SINGLE email body in Danish requesting reconsideration of the detention and release.
 
 ## Requirements:
 - Write entirely in Danish (Dansk)
@@ -370,14 +370,19 @@ Generate a UNIQUE email body in Danish requesting reconsideration of the detenti
 - Use formal legal language appropriate for police correspondence
 - About 150-250 words (not too long)
 - End with a respectful closing
-- Each email should be unique while conveying the same message
 - Address to "Til Københavns Politi" or similar
+
+## CRITICAL - OUTPUT EXACTLY ONE EMAIL:
+- Do NOT output multiple emails or variations
+- Do NOT number anything (no "Email 1:", "Email 2:", etc.)
+- Do NOT include explanations or options
+- Just write ONE SINGLE email body
 
 ## CRITICAL - NO PLACEHOLDERS:
 - Do NOT use any placeholders like <Navn på modtager>, <Underskrift>, <Name>, etc.
 - The email must be READY TO SEND as-is, no editing needed
 - Do NOT include a signature line - the sender will add their own
 
-Write ONLY the email body in Danish (no quotes, no explanations):"""
+Write ONLY ONE email body in Danish (no quotes, no numbering, no explanations):"""
 
     return subject_prompt, body_prompt
