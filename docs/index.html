@@ -9,10 +9,22 @@ var bcc = p.get('bcc') || '';
 var sub = p.get('sub') || p.get('subject') || '';
 var body = p.get('body') || '';
 
-var mailto = 'mailto:' + to + '?bcc=' + bcc + '&subject=' + encodeURIComponent(sub) + '&body=' + encodeURIComponent(body);
-window.location.href = mailto;
+// Detect mobile
+var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+var url;
+if (isMobile) {
+    // Mobile: use mailto with bcc
+    url = 'mailto:' + to + '?bcc=' + bcc + '&subject=' + encodeURIComponent(sub) + '&body=' + encodeURIComponent(body);
+} else {
+    // Desktop: use Gmail compose URL
+    var gmailTo = to || bcc;
+    url = 'https://mail.google.com/mail/?view=cm&fs=1&to=' + encodeURIComponent(gmailTo) + '&su=' + encodeURIComponent(sub) + '&body=' + encodeURIComponent(body);
+}
+
+window.location.href = url;
 </script>
 <p>If email didn't open, <a href="#" id="link">click here</a></p>
-<script>document.getElementById('link').href = mailto;</script>
+<script>document.getElementById('link').href = url;</script>
 </body>
 </html>
