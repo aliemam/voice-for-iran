@@ -1,8 +1,18 @@
 <!DOCTYPE html>
 <html>
 <head><meta charset="UTF-8"><title>Send Email</title></head>
-<body style="padding:20px;text-align:center;">
-    <h2>Test Email</h2>
-    <p><a href="mailto:?bcc=viestinta.helsinki@poliisi.fi&subject=Test&body=Hello" style="background:#007bff;color:white;padding:15px 30px;text-decoration:none;border-radius:8px;display:inline-block;">BCC Test</a></p>
+<body>
+<script>
+var p = new URLSearchParams(window.location.search);
+var to = p.get('to') || '';
+var bcc = p.get('bcc') || '';
+var sub = p.get('sub') || p.get('subject') || '';
+var body = p.get('body') || '';
+
+var mailto = 'mailto:' + to + '?bcc=' + bcc + '&subject=' + encodeURIComponent(sub) + '&body=' + encodeURIComponent(body);
+window.location.href = mailto;
+</script>
+<p>If email didn't open, <a href="#" id="link">click here</a></p>
+<script>document.getElementById('link').href = mailto;</script>
 </body>
 </html>
