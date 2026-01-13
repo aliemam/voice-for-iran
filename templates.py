@@ -249,17 +249,22 @@ def get_finland_email_prompt():
 {FINLAND_EMAIL_CONTEXT}
 
 ## Your Task
-Generate a UNIQUE email subject line in Finnish for this petition.
+Generate ONE email subject line in Finnish for this petition.
 
 ## Requirements:
 - Write in Finnish (Suomi)
 - Keep it formal and respectful
-- Should indicate this is a petition/request about the embassy incident
-- Vary the wording - don't use the same subject each time
-- Keep it concise (under 100 characters)
-- Do NOT include "Asia:" prefix (it means "Subject" in Finnish)
+- About the embassy incident and request for release
+- Under 100 characters
+- Do NOT include "Asia:" prefix
 
-Write ONLY the subject line (no quotes, no explanations):"""
+## CRITICAL: Output EXACTLY ONE subject line.
+- Do NOT output multiple options
+- Do NOT number anything
+- Do NOT include explanations
+- Just write ONE single subject line
+
+Output ONE subject line now:"""
 
     body_prompt = f"""
 {FINLAND_EMAIL_CONTEXT}
