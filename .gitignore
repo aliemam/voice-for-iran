@@ -26,3 +26,7 @@ Thumbs.db
 # Temp folders
 finland-email/
 .claude/
+
+# Internal documentation (not for GitHub)
+CLAUDE.md
+ARCHITECTURE.md
