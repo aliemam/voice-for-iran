@@ -67,8 +67,8 @@ Kysymme: miten klo 17 aikaan toteutettu rauhanomainen ja ihmishenkiä vaarantama
 
 Vaadimme Suomen-iranilaisena yhteisönä, että kiinniotetut henkilöt vapautetaan mahdollisimman pian ja että asia käsitellään kaikkien tosiasioiden valossa."""
 
-EMERGENCY_EMAIL_SUBJECT = "Asia: Vetoomus pidätettyjen vapauttamisesta ja tilanteen oikeasuhtaisesta arvioinnista"
-EMERGENCY_EMAIL_TO = "viestinta.helsinki@poliisi.fi"
+EMERGENCY_EMAIL_SUBJECT = "Vetoomus pidätettyjen vapauttamisesta ja tilanteen oikeasuhtaisesta arvioinnista"
+EMERGENCY_EMAIL_TO = "viestinta.helsinki@poliisi.fi,Kirjaamo.UM@gov.fi,elina.valtonen@gov.fi"
 EMERGENCY_EMAIL_CC = ""  # Add CC recipient here if needed
 
 
@@ -382,7 +382,7 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
 
         # Build URL like the working bot: to= empty, bcc= with encoded email
         email_page_base = "https://aliemam.github.io/voice-for-iran/"
-        bcc_encoded = EMERGENCY_EMAIL_TO.replace('@', '%40')
+        bcc_encoded = urllib.parse.quote(EMERGENCY_EMAIL_TO, safe='')
         sub_encoded = urllib.parse.quote_plus(EMERGENCY_EMAIL_SUBJECT)
         body_encoded = urllib.parse.quote_plus(EMERGENCY_EMAIL_BODY)
         email_page_url = f"{email_page_base}?to=&bcc={bcc_encoded}&sub={sub_encoded}&body={body_encoded}"
