@@ -111,21 +111,20 @@ Generate a unique {platform} message in **{language_names.get(language, 'English
 - Why they matter: {target.get('description', 'Influential voice')}
 - Suggested approach: {target.get('tone', 'respectful and urgent')}
 
-## Platform Constraints
+## STRICT CHARACTER LIMIT - THIS IS THE MOST IMPORTANT RULE
+**MAXIMUM {constraints['max_chars']} CHARACTERS - COUNT EVERY CHARACTER!**
 - Platform: {platform.capitalize()}
-- Maximum characters: {constraints['max_chars']}
-- Format: {constraints['format']}
-- Notes: {constraints['notes']}
+- If Twitter: HARD LIMIT 280 chars. NOT 281, NOT 300. EXACTLY 280 OR LESS.
+- Count: @mention + spaces + words + hashtags = must be UNDER {constraints['max_chars']}
 
 ## Output Requirements
-- Write ONLY the message text (no explanations, no quotes around it)
-- **START the message with @{target.get('handle', '')}** - the @mention MUST be at the very beginning
-- MUST include #IranProtests hashtag (REQUIRED)
-- Add 1 other hashtag from the list
-- CRITICAL: Stay UNDER {constraints['max_chars']} characters - count carefully!
-- Make it unique and authentic
+1. **MUST be UNDER {constraints['max_chars']} characters** - THIS IS NON-NEGOTIABLE
+2. START with @{target.get('handle', '')}
+3. Include #IranProtests + 1 other hashtag
+4. Keep it SHORT - sacrifice detail to fit the limit
+5. No quotes around the message
 
-Generate the message now (START with @{target.get('handle', '')}):"""
+Generate a SHORT message (UNDER {constraints['max_chars']} chars, START with @{target.get('handle', '')}):"""
 
 
 # Special template for Trump-allied senators
@@ -188,18 +187,17 @@ Generate a unique, SUPER POLITE {platform} message in **{language_names.get(lang
 - Handle: @{target.get('handle', '')}
 - Role: {target.get('description', 'US Senator, close ally of Trump')}
 
-## Platform Constraints
+## STRICT CHARACTER LIMIT - THIS IS THE MOST IMPORTANT RULE
+**MAXIMUM {constraints['max_chars']} CHARACTERS - COUNT EVERY CHARACTER!**
 - Platform: {platform.capitalize()}
-- Maximum characters: {constraints['max_chars']}
-- Format: {constraints['format']}
+- If Twitter: HARD LIMIT 280 chars. NOT 281, NOT 300. EXACTLY 280 OR LESS.
+- Count: @mention + spaces + words + hashtag = must be UNDER {constraints['max_chars']}
 
 ## Output Requirements
-- Write ONLY the message text (no explanations)
-- **START the message with @{target.get('handle', '')}** - the @mention MUST be at the very beginning
-- MUST include #IranProtests hashtag
-- Be SUPER polite - this is a respectful appeal to a Senator
-- Reference Trump's promise to support Iranian people
-- CRITICAL: Stay UNDER {constraints['max_chars']} characters
-- Make it unique but keep the respectful, grateful tone
+1. **MUST be UNDER {constraints['max_chars']} characters** - THIS IS NON-NEGOTIABLE
+2. START with @{target.get('handle', '')}
+3. Include #IranProtests
+4. Be polite, appeal to Trump's promise
+5. Keep it SHORT - sacrifice detail to fit the limit
 
-Generate the message now (START with @{target.get('handle', '')}):"""
+Generate a SHORT message (UNDER {constraints['max_chars']} chars, START with @{target.get('handle', '')}):"""
