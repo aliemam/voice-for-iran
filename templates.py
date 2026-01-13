@@ -201,3 +201,72 @@ Generate a unique, SUPER POLITE {platform} message in **{language_names.get(lang
 5. Keep it SHORT - sacrifice detail to fit the limit
 
 Generate a SHORT message (UNDER {constraints['max_chars']} chars, START with @{target.get('handle', '')}):"""
+
+
+# Finland Emergency Email Template
+FINLAND_EMAIL_CONTEXT = """
+## Context: Finland Emergency - Release of Arrested Iranian Protesters
+
+Two Iranian citizens have been arrested by Finnish police after they removed the Islamic Republic flag from the Iranian embassy in Helsinki. This was a peaceful political protest against the terrorist regime that is currently massacring civilians in Iran.
+
+## Key Points to Include (vary the wording each time):
+- Request immediate release of the arrested individuals
+- This was a political protest against a terrorist regime, not a crime
+- The Islamic Republic is currently killing thousands of civilians (12,000+ dead) during an internet blackout
+- The embassy belongs to the Iranian PEOPLE, not the regime
+- The regime's flag does not represent Iranians
+- The action was peaceful, non-violent, done at 5 PM (not secretive)
+- Ask for fair consideration of the case
+- Express gratitude for Finland's attention
+
+## Tone:
+- EXTREMELY polite and respectful (this is to Finnish authorities)
+- Formal language appropriate for official correspondence
+- Grateful and humble, not demanding
+- Appeal to human rights and justice
+
+## Language: FINNISH (Suomi)
+The entire email MUST be written in Finnish. Use formal Finnish appropriate for police/government correspondence.
+"""
+
+
+def get_finland_email_prompt():
+    """
+    Creates the prompt for generating a unique Finland emergency email.
+    Returns tuple of (subject_prompt, body_prompt)
+    """
+    subject_prompt = f"""
+{FINLAND_EMAIL_CONTEXT}
+
+## Your Task
+Generate a UNIQUE email subject line in Finnish for this petition.
+
+## Requirements:
+- Write in Finnish (Suomi)
+- Keep it formal and respectful
+- Should indicate this is a petition/request about the embassy incident
+- Vary the wording - don't use the same subject each time
+- Keep it concise (under 100 characters)
+- Do NOT include "Asia:" prefix (it means "Subject" in Finnish)
+
+Write ONLY the subject line (no quotes, no explanations):"""
+
+    body_prompt = f"""
+{FINLAND_EMAIL_CONTEXT}
+
+## Your Task
+Generate a UNIQUE email body in Finnish requesting the release of the arrested Iranian protesters.
+
+## Requirements:
+- Write entirely in Finnish (Suomi)
+- Be EXTREMELY polite and formal
+- Include the key points but vary the wording
+- Make it feel like a genuine, personal appeal
+- About 150-250 words (not too long)
+- End with a respectful closing and thanks
+- Each email should be unique while conveying the same message
+- Vary the opening - don't always start with "Arvoisa"
+
+Write ONLY the email body (no quotes, no explanations):"""
+
+    return subject_prompt, body_prompt

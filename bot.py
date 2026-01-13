@@ -20,7 +20,7 @@ from telegram.ext import (
 
 from config import BOT_TOKEN, LANGUAGES, UI
 from targets import get_all_targets, get_targets_with_instagram, get_random_target, get_target_by_handle
-from ai_generator import generate_tweet, generate_instagram_caption
+from ai_generator import generate_tweet, generate_instagram_caption, generate_finland_email
 from db import init_db, log_action
 
 # Set up logging
@@ -375,30 +375,61 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
             reply_markup=reply_markup,
         )
 
-    # Finland Emergency - Open email via redirect page
+    # Finland Emergency - Generate unique AI email
     elif data == "finland_emergency":
         await query.answer()
         log_action(telegram_id=user.id, username=user.username, action="emergency_email", target_handle=EMERGENCY_EMAIL_TO)
 
-        # Build URL like the working bot: to= empty, bcc= with encoded email
-        email_page_base = "https://aliemam.github.io/voice-for-iran/"
-        bcc_encoded = urllib.parse.quote(EMERGENCY_EMAIL_TO, safe='')
-        sub_encoded = urllib.parse.quote_plus(EMERGENCY_EMAIL_SUBJECT)
-        body_encoded = urllib.parse.quote_plus(EMERGENCY_EMAIL_BODY)
-        email_page_url = f"{email_page_base}?to=&bcc={bcc_encoded}&sub={sub_encoded}&body={body_encoded}"
-
-        keyboard = [
-            [InlineKeyboardButton("📧 ارسال ایمیل", url=email_page_url)],
-            [InlineKeyboardButton(UI["start_over"], callback_data="back_to_start")],
-        ]
-
+        # Show generating message
         await query.edit_message_text(
             f"{UI['finland_title']}\n\n"
             f"{UI['finland_situation']}\n\n"
-            f"{UI['finland_email_explain']}\n\n"
-            "✅ ایمیل آماده است! روی دکمه زیر کلیک کنید:",
-            reply_markup=InlineKeyboardMarkup(keyboard),
+            f"{UI['finland_generating']}"
         )
+
+        try:
+            # Generate unique email using AI
+            subject, body = generate_finland_email()
+
+            # Build URL with GitHub Pages redirect
+            email_page_base = "https://aliemam.github.io/voice-for-iran/"
+            bcc_encoded = urllib.parse.quote(EMERGENCY_EMAIL_TO, safe='')
+            sub_encoded = urllib.parse.quote_plus(subject)
+            body_encoded = urllib.parse.quote_plus(body)
+            email_page_url = f"{email_page_base}?to=&bcc={bcc_encoded}&sub={sub_encoded}&body={body_encoded}"
+
+            keyboard = [
+                [InlineKeyboardButton("📧 ارسال ایمیل", url=email_page_url)],
+                [InlineKeyboardButton("🔄 ایمیل دیگر بساز", callback_data="finland_regenerate")],
+                [InlineKeyboardButton(UI["start_over"], callback_data="back_to_start")],
+            ]
+
+            await query.edit_message_text(
+                f"{UI['finland_title']}\n\n"
+                f"{UI['finland_email_explain']}\n\n"
+                "✅ ایمیل منحصربه‌فرد آماده است! روی دکمه زیر کلیک کنید:",
+                reply_markup=InlineKeyboardMarkup(keyboard),
+            )
+        except Exception as e:
+            logger.error(f"Error generating Finland email: {e}")
+            # Fallback to static template
+            email_page_base = "https://aliemam.github.io/voice-for-iran/"
+            bcc_encoded = urllib.parse.quote(EMERGENCY_EMAIL_TO, safe='')
+            sub_encoded = urllib.parse.quote_plus(EMERGENCY_EMAIL_SUBJECT)
+            body_encoded = urllib.parse.quote_plus(EMERGENCY_EMAIL_BODY)
+            email_page_url = f"{email_page_base}?to=&bcc={bcc_encoded}&sub={sub_encoded}&body={body_encoded}"
+
+            keyboard = [
+                [InlineKeyboardButton("📧 ارسال ایمیل", url=email_page_url)],
+                [InlineKeyboardButton(UI["start_over"], callback_data="back_to_start")],
+            ]
+
+            await query.edit_message_text(
+                f"{UI['finland_title']}\n\n"
+                f"{UI['finland_email_explain']}\n\n"
+                "✅ ایمیل آماده است! روی دکمه زیر کلیک کنید:",
+                reply_markup=InlineKeyboardMarkup(keyboard),
+            )
 
     # Finland - Regenerate email with AI
     elif data == "finland_regenerate":
@@ -406,37 +437,18 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         await query.edit_message_text(UI["finland_generating"])
 
         try:
-            # Generate a unique version using AI
-            from ai_generator import get_generator
-            generator = get_generator()
+            # Generate unique email using AI (both subject and body)
+            subject, body = generate_finland_email()
 
-            prompt = f"""Write a polite, formal email in Finnish to Helsinki Police requesting the release of two Iranian protesters.
-
-The email MUST include ALL of these key points (translate/paraphrase them, don't copy exactly):
-1. The Islamic regime has killed thousands during internet blackout
-2. The embassy action was a political protest against a terrorist regime
-3. The embassy belongs to Iranian people, not the regime
-4. The regime's flag doesn't represent Iranians
-5. This was a peaceful act at 5pm that endangered no one
-6. Request immediate release and fair consideration
-
-Keep the same formal tone but make it unique. Write ONLY the email body in Finnish, no subject line."""
-
-            response = generator.client.messages.create(
-                model=generator.model,
-                max_tokens=1000,
-                messages=[{"role": "user", "content": prompt}],
-            )
-            unique_email = response.content[0].text.strip()
-
-            email_url = create_email_url(
-                to=EMERGENCY_EMAIL_TO,
-                subject=EMERGENCY_EMAIL_SUBJECT,
-                body=unique_email
-            )
+            # Build URL with GitHub Pages redirect
+            email_page_base = "https://aliemam.github.io/voice-for-iran/"
+            bcc_encoded = urllib.parse.quote(EMERGENCY_EMAIL_TO, safe='')
+            sub_encoded = urllib.parse.quote_plus(subject)
+            body_encoded = urllib.parse.quote_plus(body)
+            email_page_url = f"{email_page_base}?to=&bcc={bcc_encoded}&sub={sub_encoded}&body={body_encoded}"
 
             keyboard = [
-                [InlineKeyboardButton("📧 ارسال ایمیل", url=email_url)],
+                [InlineKeyboardButton("📧 ارسال ایمیل", url=email_page_url)],
                 [InlineKeyboardButton("🔄 ایمیل دیگر بساز", callback_data="finland_regenerate")],
                 [InlineKeyboardButton(UI["start_over"], callback_data="back_to_start")],
             ]
@@ -444,20 +456,20 @@ Keep the same formal tone but make it unique. Write ONLY the email body in Finni
             await query.edit_message_text(
                 f"{UI['finland_title']}\n\n"
                 "✅ ایمیل جدید آماده است!\n\n"
-                "روی دکمه زیر کلیک کنید تا Gmail باز شود.\n"
-                "فقط کافیست دکمه Send را بزنید!",
+                "روی دکمه زیر کلیک کنید:",
                 reply_markup=InlineKeyboardMarkup(keyboard),
             )
         except Exception as e:
             logger.error(f"Error generating Finland email: {e}")
-            # Fallback to original template
-            email_url = create_email_url(
-                to=EMERGENCY_EMAIL_TO,
-                subject=EMERGENCY_EMAIL_SUBJECT,
-                body=EMERGENCY_EMAIL_BODY
-            )
+            # Fallback to static template
+            email_page_base = "https://aliemam.github.io/voice-for-iran/"
+            bcc_encoded = urllib.parse.quote(EMERGENCY_EMAIL_TO, safe='')
+            sub_encoded = urllib.parse.quote_plus(EMERGENCY_EMAIL_SUBJECT)
+            body_encoded = urllib.parse.quote_plus(EMERGENCY_EMAIL_BODY)
+            email_page_url = f"{email_page_base}?to=&bcc={bcc_encoded}&sub={sub_encoded}&body={body_encoded}"
+
             keyboard = [
-                [InlineKeyboardButton("📧 ارسال ایمیل", url=email_url)],
+                [InlineKeyboardButton("📧 ارسال ایمیل", url=email_page_url)],
                 [InlineKeyboardButton(UI["start_over"], callback_data="back_to_start")],
             ]
             await query.edit_message_text(
