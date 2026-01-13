@@ -378,7 +378,7 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     # Finland Emergency - Open email via redirect page
     elif data == "finland_emergency":
         await query.answer()
-        log_action(telegram_id=user.id, username=user.username, action="finland_emergency")
+        log_action(telegram_id=user.id, username=user.username, action="emergency_email", target=EMERGENCY_EMAIL_TO)
 
         # Build URL like the working bot: to= empty, bcc= with encoded email
         email_page_base = "https://aliemam.github.io/voice-for-iran/"
