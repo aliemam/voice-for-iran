@@ -282,6 +282,12 @@ Generate a UNIQUE email body in Finnish requesting the release of the arrested I
 - Each email should be unique while conveying the same message
 - Vary the opening - don't always start with "Arvoisa"
 
+## CRITICAL - NO PLACEHOLDERS:
+- Do NOT use any placeholders like <Name>, <Recipient>, <Signature>, etc.
+- The email must be READY TO SEND as-is, no editing needed
+- Use generic greetings like "Hyvä vastaanottaja" (Dear recipient)
+- Do NOT include a signature line - the sender will add their own
+
 Write ONLY the email body (no quotes, no explanations):"""
 
     return subject_prompt, body_prompt
@@ -356,6 +362,12 @@ Generate a UNIQUE email body in Danish requesting the release of the arrested Ir
 - End with a respectful closing and thanks
 - Each email should be unique while conveying the same message
 - Vary the opening
+
+## CRITICAL - NO PLACEHOLDERS:
+- Do NOT use any placeholders like <Navn på modtager>, <Underskrift>, <Name>, etc.
+- The email must be READY TO SEND as-is, no editing needed
+- Use generic greetings like "Kære modtager" or "Til rette vedkommende" (Dear recipient)
+- Do NOT include a signature line - the sender will add their own
 
 Write ONLY the email body in Danish (no quotes, no explanations):"""
 

@@ -102,7 +102,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
     keyboard = [
         [InlineKeyboardButton(UI["finland_button"], callback_data="finland_emergency")],
-        [InlineKeyboardButton(UI["denmark_button"], callback_data="denmark_emergency")],
         [InlineKeyboardButton(UI["platforms"]["twitter"], callback_data="platform_twitter")],
         [InlineKeyboardButton(UI["platforms"]["instagram"], callback_data="platform_instagram")],
     ]
@@ -376,7 +375,6 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
 
         keyboard = [
             [InlineKeyboardButton(UI["finland_button"], callback_data="finland_emergency")],
-            [InlineKeyboardButton(UI["denmark_button"], callback_data="denmark_emergency")],
             [InlineKeyboardButton(UI["platforms"]["twitter"], callback_data="platform_twitter")],
             [InlineKeyboardButton(UI["platforms"]["instagram"], callback_data="platform_instagram")],
         ]
@@ -412,7 +410,6 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
 
             keyboard = [
                 [InlineKeyboardButton("📧 ارسال ایمیل", url=email_page_url)],
-                [InlineKeyboardButton("🔄 ایمیل دیگر بساز", callback_data="finland_regenerate")],
                 [InlineKeyboardButton(UI["start_over"], callback_data="back_to_start")],
             ]
 
@@ -440,54 +437,6 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
                 f"{UI['finland_title']}\n\n"
                 f"{UI['finland_email_explain']}\n\n"
                 "✅ ایمیل آماده است! روی دکمه زیر کلیک کنید:",
-                reply_markup=InlineKeyboardMarkup(keyboard),
-            )
-
-    # Finland - Regenerate email with AI
-    elif data == "finland_regenerate":
-        await query.answer()
-        await query.edit_message_text(UI["finland_generating"])
-
-        try:
-            # Generate unique email using AI (both subject and body)
-            subject, body = generate_finland_email()
-
-            # Build URL with GitHub Pages redirect
-            email_page_base = "https://aliemam.github.io/voice-for-iran/"
-            bcc_encoded = urllib.parse.quote(EMERGENCY_EMAIL_TO, safe='')
-            sub_encoded = urllib.parse.quote_plus(subject)
-            body_encoded = urllib.parse.quote_plus(body)
-            email_page_url = f"{email_page_base}?to=&bcc={bcc_encoded}&sub={sub_encoded}&body={body_encoded}"
-
-            keyboard = [
-                [InlineKeyboardButton("📧 ارسال ایمیل", url=email_page_url)],
-                [InlineKeyboardButton("🔄 ایمیل دیگر بساز", callback_data="finland_regenerate")],
-                [InlineKeyboardButton(UI["start_over"], callback_data="back_to_start")],
-            ]
-
-            await query.edit_message_text(
-                f"{UI['finland_title']}\n\n"
-                "✅ ایمیل جدید آماده است!\n\n"
-                "روی دکمه زیر کلیک کنید:",
-                reply_markup=InlineKeyboardMarkup(keyboard),
-            )
-        except Exception as e:
-            logger.error(f"Error generating Finland email: {e}")
-            # Fallback to static template
-            email_page_base = "https://aliemam.github.io/voice-for-iran/"
-            bcc_encoded = urllib.parse.quote(EMERGENCY_EMAIL_TO, safe='')
-            sub_encoded = urllib.parse.quote_plus(EMERGENCY_EMAIL_SUBJECT)
-            body_encoded = urllib.parse.quote_plus(EMERGENCY_EMAIL_BODY)
-            email_page_url = f"{email_page_base}?to=&bcc={bcc_encoded}&sub={sub_encoded}&body={body_encoded}"
-
-            keyboard = [
-                [InlineKeyboardButton("📧 ارسال ایمیل", url=email_page_url)],
-                [InlineKeyboardButton(UI["start_over"], callback_data="back_to_start")],
-            ]
-            await query.edit_message_text(
-                f"{UI['finland_title']}\n\n"
-                "✅ ایمیل آماده است!\n\n"
-                "روی دکمه زیر کلیک کنید.",
                 reply_markup=InlineKeyboardMarkup(keyboard),
             )
 
@@ -517,7 +466,6 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
 
             keyboard = [
                 [InlineKeyboardButton("📧 ارسال ایمیل", url=email_page_url)],
-                [InlineKeyboardButton("🔄 ایمیل دیگر بساز", callback_data="denmark_regenerate")],
                 [InlineKeyboardButton(UI["start_over"], callback_data="back_to_start")],
             ]
 
@@ -545,55 +493,6 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
                 f"{UI['denmark_title']}\n\n"
                 f"{UI['denmark_email_explain']}\n\n"
                 "✅ ایمیل آماده است! روی دکمه زیر کلیک کنید:",
-                reply_markup=InlineKeyboardMarkup(keyboard),
-            )
-
-    # Denmark - Regenerate email with AI
-    elif data == "denmark_regenerate":
-        await query.answer()
-        await query.edit_message_text(UI["denmark_generating"])
-
-        try:
-            # Generate unique email using AI (both subject and body)
-            from ai_generator import generate_denmark_email
-            subject, body = generate_denmark_email()
-
-            # Build URL with GitHub Pages redirect
-            email_page_base = "https://aliemam.github.io/voice-for-iran/"
-            bcc_encoded = urllib.parse.quote(DENMARK_EMAIL_TO, safe='')
-            sub_encoded = urllib.parse.quote_plus(subject)
-            body_encoded = urllib.parse.quote_plus(body)
-            email_page_url = f"{email_page_base}?to=&bcc={bcc_encoded}&sub={sub_encoded}&body={body_encoded}"
-
-            keyboard = [
-                [InlineKeyboardButton("📧 ارسال ایمیل", url=email_page_url)],
-                [InlineKeyboardButton("🔄 ایمیل دیگر بساز", callback_data="denmark_regenerate")],
-                [InlineKeyboardButton(UI["start_over"], callback_data="back_to_start")],
-            ]
-
-            await query.edit_message_text(
-                f"{UI['denmark_title']}\n\n"
-                "✅ ایمیل جدید آماده است!\n\n"
-                "روی دکمه زیر کلیک کنید:",
-                reply_markup=InlineKeyboardMarkup(keyboard),
-            )
-        except Exception as e:
-            logger.error(f"Error generating Denmark email: {e}")
-            # Fallback to static template
-            email_page_base = "https://aliemam.github.io/voice-for-iran/"
-            bcc_encoded = urllib.parse.quote(DENMARK_EMAIL_TO, safe='')
-            sub_encoded = urllib.parse.quote_plus(DENMARK_EMAIL_SUBJECT)
-            body_encoded = urllib.parse.quote_plus(DENMARK_EMAIL_BODY)
-            email_page_url = f"{email_page_base}?to=&bcc={bcc_encoded}&sub={sub_encoded}&body={body_encoded}"
-
-            keyboard = [
-                [InlineKeyboardButton("📧 ارسال ایمیل", url=email_page_url)],
-                [InlineKeyboardButton(UI["start_over"], callback_data="back_to_start")],
-            ]
-            await query.edit_message_text(
-                f"{UI['denmark_title']}\n\n"
-                "✅ ایمیل آماده است!\n\n"
-                "روی دکمه زیر کلیک کنید.",
                 reply_markup=InlineKeyboardMarkup(keyboard),
             )
 
