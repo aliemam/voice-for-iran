@@ -55,17 +55,17 @@ def create_email_url(to: str, subject: str, body: str) -> str:
 
 # Emergency email campaign - update these for each campaign
 # Current: Finland - Release of arrested protesters
-EMERGENCY_EMAIL_BODY = """Vetoomus Iranin Suurlähetystön tapaukseen liittyvien kiinniotettujen vapauttamiseksi.
+EMERGENCY_EMAIL_BODY = """Hyvä vastaanottaja,
 
-Islamilainen hallinto on viimeisten 98 tunnin yhteys-blackoutin aikana tappanut tuhansia ihmisiä. Näkemyksemme mukaan toiminta lähetystössä on ollut poliittinen mielenilmaus terroristista hallintoa vastaan, joka tällä hetkellä käyttää väkivaltaa ja toteuttaa massamurhia kansaamme kohtaan.
+Kirjoitan teille koskien kahta henkilöä, jotka poliisi otti kiinni Iranin suurlähetystön pihalla Helsingissä tapahtuneen lipputangon kaatamiseen ja aidan töhrimiseen liittyen. Uutisten mukaan heitä epäillään törkeästä julkisrauhan rikkomisesta ja vahingonteosta.
 
-Suurlähetystö kuuluu Iranin kansalaisille, mutta nykyinen suurlähetystö on islamilaisen hallinnon alaisuudessa toimivien henkilöiden miehittämä. Näiden henkilöiden tehtävänä on valvoa ulkomailla asuvia iranilaisia sekä toteuttaa hallinnon toimeksiantoja, mukaan lukien poliittisia salamurhia.
+Kansainvälisessä mediassa ja ihmisoikeusjärjestöjen raporteissa on parhaillaan laajaa huolta Iranin sisäisistä protesteista, niihin liittyvästä väkivallasta ja yli kymmenentuhannen mielenosoittajan pidätyksistä sekä suurista kuolonuhrimääristä, kun mielenosoittajat vaativat poliittisia ja sosiaalisia oikeuksia sekä hallinnon uudistuksia. Näitä protesteja on kuvattu laajaksi, rauhanomaiseksi, mutta myös voimakkaasti tukevaksi iranilaisten omille vaatimuksille paremmista oikeuksista ja vapaudesta.
 
-Tämän taustan vuoksi tapahtunut teko on nähtävä iranilaisessa yhteisössä sankarillisena, isänmaallisena ja ihmisoikeuksia puolustavana tekona. Hirmuhallintoa vastaan ei tulisi olla hiljaa. Islamilaisella hallinnolla ei ole legitimiteettiä johtaa Irania, ja sen suurlähetystö on näin ollen miehitetty/kaapattu alue. Islamilaisen hallinnon lippu ei ole Iranin virallinen lippu, eikä sen tule edustaa iranilaisia ulkomailla.
+On tärkeää, että perustuslaillisia oikeuksia ja oikeasuhtaisuutta sovelletaan myös Suomessa, kun arvioidaan tekoja, jotka on tehty osana poliittista ilmaisua tai solidaarisuutta laajempia ihmisoikeuksien vaatimuksia kohtaan. Pyydän teitä harkitsemaan uudelleen heidän tapauksen käsittelyä ja pidätettyjen vapauttamista tai vaihtoehtoisesti vapauttavia toimenpiteitä, mikäli heidän vapaudenmenetykselleen ei ole selkeää ja oikeasuhtaista lakiperustetta.
 
-Kysymme: miten klo 17 aikaan toteutettu rauhanomainen ja ihmishenkiä vaarantamaton teko voidaan tulkita julkisrauhan rikkomiseksi?
+Arvostan suuresti poliisin työtä yleisen järjestyksen ylläpitämiseksi, mutta korostan, että oikeudenmukaisuus ja ilmaisunvapauden turvaaminen ovat keskeisiä perusoikeuksia, joiden kunnioittaminen on tärkeää myös tällaisissa poliittisesti latautuneissa tilanteissa.
 
-Vaadimme Suomen-iranilaisena yhteisönä, että kiinniotetut henkilöt vapautetaan mahdollisimman pian ja että asia käsitellään kaikkien tosiasioiden valossa."""
+Kiitos ajastanne ja huomiostanne."""
 
 EMERGENCY_EMAIL_SUBJECT = "Vetoomus pidätettyjen vapauttamisesta ja tilanteen oikeasuhtaisesta arvioinnista"
 EMERGENCY_EMAIL_TO = "viestinta.helsinki@poliisi.fi,Kirjaamo.UM@gov.fi,elina.valtonen@gov.fi"

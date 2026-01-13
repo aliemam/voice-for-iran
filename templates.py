@@ -207,26 +207,36 @@ Generate a SHORT message (UNDER {constraints['max_chars']} chars, START with @{t
 FINLAND_EMAIL_CONTEXT = """
 ## Context: Finland Emergency - Release of Arrested Iranian Protesters
 
-Two Iranian citizens have been arrested by Finnish police after they removed the Islamic Republic flag from the Iranian embassy in Helsinki. This was a peaceful political protest against the terrorist regime that is currently massacring civilians in Iran.
+Two Iranian citizens have been arrested by Finnish police after they removed the Islamic Republic flag from the Iranian embassy in Helsinki.
 
-## Key Points to Include (vary the wording each time):
-- Request immediate release of the arrested individuals
-- This was a political protest against a terrorist regime, not a crime
-- The Islamic Republic is currently killing thousands of civilians (12,000+ dead) during an internet blackout
-- The embassy belongs to the Iranian PEOPLE, not the regime
-- The regime's flag does not represent Iranians
-- The action was peaceful, non-violent, done at 5 PM (not secretive)
-- Ask for fair consideration of the case
-- Express gratitude for Finland's attention
+## Base Template (use this as reference, but vary the wording each time):
+```
+Hyvä vastaanottaja,
+Kirjoitan teille koskien kahta henkilöä, jotka poliisi otti kiinni Iranin suurlähetystön pihalla Helsingissä tapahtuneen lipputangon kaatamiseen ja aidan töhrimiseen liittyen. Uutisten mukaan heitä epäillään törkeästä julkisrauhan rikkomisesta ja vahingonteosta.
+Kansainvälisessä mediassa ja ihmisoikeusjärjestöjen raporteissa on parhaillaan laajaa huolta Iranin sisäisistä protesteista, niihin liittyvästä väkivallasta ja yli kymmenentuhannen mielenosoittajan pidätyksistä sekä suurista kuolonuhrimääristä, kun mielenosoittajat vaativat poliittisia ja sosiaalisia oikeuksia sekä hallinnon uudistuksia. Näitä protesteja on kuvattu laajaksi, rauhanomaiseksi, mutta myös voimakkaasti tukevaksi iranilaisten omille vaatimuksille paremmista oikeuksista ja vapaudesta.
+On tärkeää, että perustuslaillisia oikeuksia ja oikeasuhtaisuutta sovelletaan myös Suomessa, kun arvioidaan tekoja, jotka on tehty osana poliittista ilmaisua tai solidaarisuutta laajempia ihmisoikeuksien vaatimuksia kohtaan. Pyydän teitä harkitsemaan uudelleen heidän tapauksen käsittelyä ja pidätettyjen vapauttamista tai vaihtoehtoisesti vapauttavia toimenpiteitä, mikäli heidän vapaudenmenetykselleen ei ole selkeää ja oikeasuhtaista lakiperustetta.
+Arvostan suuresti poliisin työtä yleisen järjestyksen ylläpitämiseksi, mutta korostan, että oikeudenmukaisuus ja ilmaisunvapauden turvaaminen ovat keskeisiä perusoikeuksia, joiden kunnioittaminen on tärkeää myös tällaisissa poliittisesti latautuneissa tilanteissa.
+Kiitos ajastanne ja huomiostanne.
+```
+
+## Key Points (from template above):
+- Two people arrested for toppling flag pole and vandalizing fence at Iranian embassy
+- Suspected of aggravated breach of public peace and vandalism
+- International media and human rights organizations report on Iran protests
+- Over 10,000 protesters arrested, large death tolls
+- Protesters demanding political/social rights and government reforms
+- Constitutional rights and proportionality should apply in Finland
+- Request reconsideration, release, or alternative measures
+- Appreciate police work but emphasize justice and freedom of expression
 
 ## Tone:
-- EXTREMELY polite and respectful (this is to Finnish authorities)
-- Formal language appropriate for official correspondence
+- EXTREMELY polite and respectful
+- Formal Finnish language
 - Grateful and humble, not demanding
-- Appeal to human rights and justice
+- Appeal to constitutional rights and proportionality
 
 ## Language: FINNISH (Suomi)
-The entire email MUST be written in Finnish. Use formal Finnish appropriate for police/government correspondence.
+The entire email MUST be written in Finnish. Vary the wording but keep the same message and tone.
 """
 
 
