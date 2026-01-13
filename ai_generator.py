@@ -5,7 +5,7 @@ Generates unique, personalized messages for social media.
 
 import anthropic
 from config import ANTHROPIC_API_KEY, CLAUDE_MODEL
-from templates import get_system_prompt, get_generation_prompt
+from templates import get_system_prompt, get_generation_prompt, get_trump_senator_prompt
 
 
 class MessageGenerator:
@@ -31,7 +31,12 @@ class MessageGenerator:
             Generated message string
         """
         system_prompt = get_system_prompt()
-        user_prompt = get_generation_prompt(target, language, platform)
+
+        # Use special template for Trump-allied senators
+        if target.get("category") == "trump_senator":
+            user_prompt = get_trump_senator_prompt(target, language, platform)
+        else:
+            user_prompt = get_generation_prompt(target, language, platform)
 
         try:
             response = self.client.messages.create(

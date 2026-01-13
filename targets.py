@@ -112,6 +112,43 @@ TARGETS = [
         "description": "Human rights investigations",
         "tone": "Request investigation",
     },
+    # Trump-allied US Senators - Special category with custom template
+    {
+        "name": "Senator Markwayne Mullin",
+        "handle": "SenMullin",
+        "instagram": "senmullin",
+        "description_fa": "سناتور آمریکا - نزدیک به ترامپ",
+        "description": "US Senator from Oklahoma, close ally of Trump",
+        "tone": "Super polite, formal, appeal to Trump promise",
+        "category": "trump_senator",
+    },
+    {
+        "name": "Senator Lindsey Graham",
+        "handle": "LindseyGrahamSC",
+        "instagram": "lindseygrahamsc",
+        "description_fa": "سناتور آمریکا - نزدیک به ترامپ",
+        "description": "US Senator from South Carolina, senior Republican, close ally of Trump",
+        "tone": "Super polite, formal, appeal to Trump promise",
+        "category": "trump_senator",
+    },
+    {
+        "name": "Senator Ted Cruz",
+        "handle": "SenTedCruz",
+        "instagram": "sentedcruz",
+        "description_fa": "سناتور آمریکا - نزدیک به ترامپ",
+        "description": "US Senator from Texas, vocal on Iran, close ally of Trump",
+        "tone": "Super polite, formal, appeal to Trump promise",
+        "category": "trump_senator",
+    },
+    {
+        "name": "Senator Eric Schmitt",
+        "handle": "SenEricSchmitt",
+        "instagram": "senericschmitt",
+        "description_fa": "سناتور آمریکا - نزدیک به ترامپ",
+        "description": "US Senator from Missouri, close ally of Trump",
+        "tone": "Super polite, formal, appeal to Trump promise",
+        "category": "trump_senator",
+    },
 ]
 
 

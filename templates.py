@@ -4,14 +4,16 @@ This provides Claude with the necessary context about the Iran situation.
 """
 
 IRAN_CONTEXT = """
-## Current Situation in Iran (Updated Context)
+## Current Situation in Iran (Updated Context - January 2026)
 
-The Iranian regime has imposed a severe internet shutdown across the country while violently suppressing protests. Key facts:
+The Iranian clerical regime has imposed a total internet blackout and begun widespread killings of civilians. VERIFIED FACTS:
 
-- Complete internet blackout in many regions, cutting people off from the outside world
-- Security forces are killing protesters, including children
-- Arbitrary arrests and detentions of activists, journalists, and ordinary citizens
-- The world needs to know what is happening and put pressure on the regime
+- **12,000+ civilians killed** since the internet blackout began (reported by sources inside Iran)
+- Complete internet shutdown for over 98 hours, cutting 90 million people from the world
+- Security forces shooting protesters in the streets, including women and children
+- Mass arrests of activists, journalists, students, and ordinary citizens
+- Hospitals overwhelmed, families cannot find their loved ones
+- The regime is hiding a massacre from the world
 
 ## Key Hashtags
 IMPORTANT: Always include #IranProtests in every message. Pick 1 other:
@@ -23,17 +25,18 @@ IMPORTANT: Always include #IranProtests in every message. Pick 1 other:
 
 ## Tone Guidelines
 - Urgent but not alarmist
-- Factual and credible
+- Factual and credible - cite the death toll
 - Respectful to the recipient
 - Personal and authentic (not robotic or templated)
 - Call to action when appropriate
 
-## What We're Asking
-- Journalists: Cover the story, investigate, report
-- Politicians: Speak out, impose sanctions, take diplomatic action
-- Celebrities: Use your platform to raise awareness
-- Tech Leaders: Help restore internet access (Starlink, etc.)
-- Organizations: Document abuses, advocate for human rights
+## What We're Asking (PERSONALIZE based on who they are)
+- **Journalists**: Cover the story, investigate, send reporters, expose the massacre
+- **Politicians**: Speak out publicly, impose sanctions, diplomatic pressure, support free internet
+- **Celebrities**: Use your massive platform to raise awareness, share stories
+- **Tech Leaders**: Help restore internet access (Starlink), provide communication tools
+- **Organizations**: Document abuses, issue urgent statements, advocate at UN level
+- **UN Officials**: Investigate, condemn, emergency session, send observers
 """
 
 PLATFORM_CONSTRAINTS = {
@@ -121,5 +124,82 @@ Generate a unique {platform} message in **{language_names.get(language, 'English
 - Add 1 other hashtag from the list
 - CRITICAL: Stay UNDER {constraints['max_chars']} characters - count carefully!
 - Make it unique and authentic
+
+Generate the message now:"""
+
+
+# Special template for Trump-allied senators
+TRUMP_SENATOR_TEMPLATE = """
+## Special Context: Appeal to Trump-Allied Senator
+
+You are writing to a US Senator who is a close ally of President Donald Trump. President Trump has publicly promised to support the Iranian people in their fight for freedom.
+
+## The Core Message (adapt this, don't copy verbatim)
+"Senator, with respect, please urge Donald Trump to stand by his promise to support the Iranian people. The clerical regime has shut down the internet and has begun widespread killings of civilians. We urgently need international pressure, protection of lives, and support for free internet access. Thank you."
+
+## Critical Instructions
+- Be EXTREMELY polite and respectful - use "Senator" as address
+- Appeal to Trump's promise to support Iranian people
+- Reference the internet shutdown and civilian killings (12,000+ dead)
+- Ask for: international pressure, protection of lives, free internet access
+- End with gratitude ("Thank you" or similar)
+- Keep the formal, respectful tone throughout
+- This is a plea for help, not a demand
+
+## What Makes This Different
+- These senators have direct influence on Trump administration policy
+- They can advocate for US action to help Iranians
+- Trump has promised to support Iranian freedom - remind them of this
+- Be diplomatic, grateful, and earnest
+"""
+
+
+def get_trump_senator_prompt(target: dict, language: str, platform: str) -> str:
+    """
+    Creates a special prompt for Trump-allied senators.
+    """
+    constraints = PLATFORM_CONSTRAINTS.get(platform, PLATFORM_CONSTRAINTS["twitter"])
+
+    language_names = {
+        "en": "English",
+        "fa": "Persian (Farsi)",
+        "nl": "Dutch",
+        "ar": "Arabic",
+        "fr": "French",
+        "fi": "Finnish",
+        "it": "Italian",
+        "es": "Spanish",
+    }
+
+    return f"""
+{TRUMP_SENATOR_TEMPLATE}
+
+## Current Facts to Reference
+- 12,000+ civilians killed since internet blackout
+- 98+ hours of complete internet shutdown
+- Regime hiding massacre from the world
+- Iranian people desperately need international support
+
+## Your Task
+Generate a unique, SUPER POLITE {platform} message in **{language_names.get(language, 'English')}** to this Senator.
+
+## Target Information
+- Name: {target.get('name', 'Senator')}
+- Handle: @{target.get('handle', '')}
+- Role: {target.get('description', 'US Senator, close ally of Trump')}
+
+## Platform Constraints
+- Platform: {platform.capitalize()}
+- Maximum characters: {constraints['max_chars']}
+- Format: {constraints['format']}
+
+## Output Requirements
+- Write ONLY the message text (no explanations)
+- Include @{target.get('handle', '')} mention
+- MUST include #IranProtests hashtag
+- Be SUPER polite - this is a respectful appeal to a Senator
+- Reference Trump's promise to support Iranian people
+- CRITICAL: Stay UNDER {constraints['max_chars']} characters
+- Make it unique but keep the respectful, grateful tone
 
 Generate the message now:"""
