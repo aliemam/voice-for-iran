@@ -381,16 +381,13 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         log_action(telegram_id=user.id, username=user.username, action="finland_emergency")
 
         # Build mailto redirect URL with query parameters
+        # Don't encode @ in email addresses
         email_page_base = "https://aliemam.github.io/voice-for-iran/"
-        params_dict = {
-            'to': EMERGENCY_EMAIL_TO,
-            'subject': EMERGENCY_EMAIL_SUBJECT,
-            'body': EMERGENCY_EMAIL_BODY
-        }
+        encoded_subject = urllib.parse.quote(EMERGENCY_EMAIL_SUBJECT, safe='')
+        encoded_body = urllib.parse.quote(EMERGENCY_EMAIL_BODY, safe='')
+        email_page_url = f"{email_page_base}?to={EMERGENCY_EMAIL_TO}&subject={encoded_subject}&body={encoded_body}"
         if EMERGENCY_EMAIL_CC:
-            params_dict['cc'] = EMERGENCY_EMAIL_CC
-        params = urllib.parse.urlencode(params_dict)
-        email_page_url = f"{email_page_base}?{params}"
+            email_page_url += f"&cc={EMERGENCY_EMAIL_CC}"
 
         keyboard = [
             [InlineKeyboardButton("📧 ارسال ایمیل", url=email_page_url)],
