@@ -295,29 +295,39 @@ Write ONLY the email body (no quotes, no explanations):"""
 
 # Denmark Emergency Email Template
 DENMARK_EMAIL_CONTEXT = """
-## Context: Denmark Emergency - Release of Arrested Iranian Protesters
+## Context: Denmark Emergency - Request for Reconsideration and Release
 
-Iranian citizens have been arrested by Danish police after protesting at the Iranian embassy in Denmark. This was a peaceful political protest against the terrorist regime that is currently massacring civilians in Iran.
+A person was arrested in connection with an incident at the Islamic Republic's embassy in Denmark.
 
-## Key Points to Include (vary the wording each time):
-- During the past 98 hours of internet blackout, the Islamic regime has killed thousands
-- The embassy action was a political protest against a terrorist regime using violence and mass killings
-- The embassy belongs to Iranian citizens, but is occupied by regime operatives
-- These operatives monitor Iranians abroad and carry out regime orders including political assassinations
-- This should be seen as a heroic, patriotic act in defense of human rights
-- One must not remain silent in the face of tyranny
-- The Islamic regime has no legitimacy - the embassy is occupied/hijacked space
-- The regime's flag is not Iran's official flag and should not represent Iranians abroad
-- Request release and fair consideration of the case
+## Base Template (use as reference, vary the wording each time):
+```
+Til Københavns Politi / De relevante politimyndigheder,
+
+Jeg henvender mig hermed med en formel anmodning om genovervejelse af tilbageholdelsen af den person, der blev anholdt i forbindelse med hændelsen på Den Islamiske Republiks ambassade i Danmark.
+
+Det ønskes præciseret, at der – efter de foreliggende oplysninger – ikke er sket nogen form for fysisk skade på personer i forbindelse med hændelsen. Den pågældendes adfærd bestod primært af verbal aggression, som må anses for at være udtryk for en ophobet følelsesmæssig belastning og stærk vrede i en politisk og protestmæssig kontekst.
+
+Det anerkendes samtidig, at der er sket skade på ejendom, hvilket naturligvis er et forhold, der skal behandles i overensstemmelse med gældende dansk lovgivning. På trods heraf anmodes der om, at proportionalitetsprincippet samt den konkrete situation og den pågældendes psykiske og følelsesmæssige tilstand på gerningstidspunktet tillægges væsentlig betydning i den videre vurdering.
+
+På denne baggrund anmodes der respektfuldt om, at politiet overvejer løsladelse, eventuelt med alternative eller mildere foranstaltninger, frem for fortsat frihedsberøvelse, indtil sagen måtte blive endeligt afgjort.
+```
+
+## Key Points (from template above):
+- Formal request for reconsideration of detention
+- No physical harm to any persons occurred
+- Behavior was verbal aggression from accumulated emotional burden and anger in political protest context
+- Property damage is acknowledged and should be handled according to Danish law
+- Request that proportionality principle and the person's mental/emotional state be considered
+- Request release or alternative/milder measures instead of continued detention
 
 ## Tone:
-- EXTREMELY polite and respectful (this is to Danish Foreign Ministry)
-- Formal language appropriate for official government correspondence
-- Grateful and humble, not demanding
-- Appeal to human rights and justice
+- EXTREMELY polite and respectful (this is to Copenhagen Police)
+- Formal legal language appropriate for police correspondence
+- Acknowledging the legal situation while requesting leniency
+- Respectful and humble, not demanding
 
 ## Language: DANISH (Dansk)
-The entire email MUST be written in Danish. Use formal Danish appropriate for government correspondence.
+The entire email MUST be written in Danish. Use formal Danish appropriate for police correspondence.
 """
 
 
@@ -335,9 +345,9 @@ Generate ONE email subject line in Danish for this petition.
 ## Requirements:
 - Write in Danish (Dansk)
 - Keep it formal and respectful
-- About the embassy incident and detained individuals
+- About requesting reconsideration and release
 - Under 100 characters
-- Based on: "Appeal for the Release of Those Detained in Connection with the Iranian Embassy Incident"
+- Based on: "Anmodning om genovervejelse og løsladelse – politimæssig vurdering"
 
 ## CRITICAL: Output EXACTLY ONE subject line.
 - Do NOT output multiple options
@@ -351,22 +361,21 @@ Output ONE subject line now:"""
 {DENMARK_EMAIL_CONTEXT}
 
 ## Your Task
-Generate a UNIQUE email body in Danish requesting the release of the arrested Iranian protesters.
+Generate a UNIQUE email body in Danish requesting reconsideration of the detention and release.
 
 ## Requirements:
 - Write entirely in Danish (Dansk)
-- Be EXTREMELY polite and formal
-- Include all the key points but vary the wording
-- Make it feel like a genuine, personal appeal
+- Be EXTREMELY polite and formal (this is to police)
+- Include the key points but vary the wording from the template
+- Use formal legal language appropriate for police correspondence
 - About 150-250 words (not too long)
-- End with a respectful closing and thanks
+- End with a respectful closing
 - Each email should be unique while conveying the same message
-- Vary the opening
+- Address to "Til Københavns Politi" or similar
 
 ## CRITICAL - NO PLACEHOLDERS:
 - Do NOT use any placeholders like <Navn på modtager>, <Underskrift>, <Name>, etc.
 - The email must be READY TO SEND as-is, no editing needed
-- Use generic greetings like "Kære modtager" or "Til rette vedkommende" (Dear recipient)
 - Do NOT include a signature line - the sender will add their own
 
 Write ONLY the email body in Danish (no quotes, no explanations):"""

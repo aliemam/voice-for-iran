@@ -71,14 +71,18 @@ EMERGENCY_EMAIL_SUBJECT = "Vetoomus pidätettyjen vapauttamisesta ja tilanteen o
 EMERGENCY_EMAIL_TO = "viestinta.helsinki@poliisi.fi,Kirjaamo.UM@gov.fi,elina.valtonen@gov.fi"
 EMERGENCY_EMAIL_CC = ""  # Add CC recipient here if needed
 
-# Denmark Emergency - Release of arrested protesters
-DENMARK_EMAIL_BODY = """During the past 98 hours of an internet blackout, the Islamic regime has killed thousands of people. In our view, the action at the embassy was a political protest against a terrorist regime that is currently using violence and carrying out mass killings against our people.
+# Denmark Emergency - Request for reconsideration and release
+DENMARK_EMAIL_BODY = """Til Københavns Politi / De relevante politimyndigheder,
 
-The embassy belongs to the citizens of Iran; however, the current embassy is occupied by individuals operating under the Islamic regime. These individuals are tasked with monitoring Iranians living abroad and carrying out the regime's orders, including political assassinations.
+Jeg henvender mig hermed med en formel anmodning om genovervejelse af tilbageholdelsen af den person, der blev anholdt i forbindelse med hændelsen på Den Islamiske Republiks ambassade i Danmark.
 
-Given this context, the action in question should be seen within the Iranian community as a heroic, patriotic act in defense of human rights. One must not remain silent in the face of tyranny. The Islamic regime has no legitimacy to govern Iran, and its embassy is therefore an occupied or hijacked space. The flag of the Islamic regime is not Iran's official flag and should not represent Iranians abroad."""
+Det ønskes præciseret, at der – efter de foreliggende oplysninger – ikke er sket nogen form for fysisk skade på personer i forbindelse med hændelsen. Den pågældendes adfærd bestod primært af verbal aggression, som må anses for at være udtryk for en ophobet følelsesmæssig belastning og stærk vrede i en politisk og protestmæssig kontekst.
 
-DENMARK_EMAIL_SUBJECT = "Appeal for the Release of Those Detained in Connection with the Iranian Embassy Incident"
+Det anerkendes samtidig, at der er sket skade på ejendom, hvilket naturligvis er et forhold, der skal behandles i overensstemmelse med gældende dansk lovgivning. På trods heraf anmodes der om, at proportionalitetsprincippet samt den konkrete situation og den pågældendes psykiske og følelsesmæssige tilstand på gerningstidspunktet tillægges væsentlig betydning i den videre vurdering.
+
+På denne baggrund anmodes der respektfuldt om, at politiet overvejer løsladelse, eventuelt med alternative eller mildere foranstaltninger, frem for fortsat frihedsberøvelse, indtil sagen måtte blive endeligt afgjort."""
+
+DENMARK_EMAIL_SUBJECT = "Anmodning om genovervejelse og løsladelse – politimæssig vurdering"
 DENMARK_EMAIL_TO = "udenrigsminister@um.dk,um@um.dk"
 
 
@@ -102,6 +106,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
     keyboard = [
         [InlineKeyboardButton(UI["finland_button"], callback_data="finland_emergency")],
+        [InlineKeyboardButton(UI["denmark_button"], callback_data="denmark_emergency")],
         [InlineKeyboardButton(UI["platforms"]["twitter"], callback_data="platform_twitter")],
         [InlineKeyboardButton(UI["platforms"]["instagram"], callback_data="platform_instagram")],
     ]
@@ -375,6 +380,7 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
 
         keyboard = [
             [InlineKeyboardButton(UI["finland_button"], callback_data="finland_emergency")],
+            [InlineKeyboardButton(UI["denmark_button"], callback_data="denmark_emergency")],
             [InlineKeyboardButton(UI["platforms"]["twitter"], callback_data="platform_twitter")],
             [InlineKeyboardButton(UI["platforms"]["instagram"], callback_data="platform_instagram")],
         ]
