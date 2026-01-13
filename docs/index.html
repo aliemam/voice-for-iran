@@ -2,17 +2,28 @@
 <html>
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Send Email</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; text-align: center; }
+        .btn { display: inline-block; background: #007bff; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; margin: 10px; font-size: 18px; }
+        .btn:hover { background: #0056b3; }
+        .note { color: #666; margin-top: 20px; font-size: 14px; }
+    </style>
 </head>
 <body>
-    <p>If email app did not open, <a href="#" id="link">click here</a></p>
+    <h2>Send Email</h2>
+    <p id="recipient"></p>
+
+    <a href="#" id="link" class="btn">Open Email App</a>
+
+    <p class="note">If email doesn't open or "To" is empty:<br>
+    Copy this link and open in Chrome/Safari</p>
+    <input type="text" id="copyurl" style="width:90%; padding:10px; margin-top:10px;" readonly>
+
     <script>
-        // Campaign email addresses - add new campaigns here
         var campaigns = {
-            'finland': {
-                to: 'viestinta.helsinki@poliisi.fi',
-                cc: ''
-            }
+            'finland': { to: 'viestinta.helsinki@poliisi.fi', cc: '' }
         };
 
         var p = new URLSearchParams(window.location.search);
@@ -20,22 +31,22 @@
         var subject = p.get('subject') || '';
         var body = p.get('body') || '';
 
-        // Get email from campaign or from URL
-        var to = '';
-        var cc = '';
-        if (campaign && campaigns[campaign]) {
-            to = campaigns[campaign].to;
-            cc = campaigns[campaign].cc;
-        } else {
-            to = p.get('to') || '';
-            cc = p.get('cc') || '';
-        }
+        var to = campaign && campaigns[campaign] ? campaigns[campaign].to : (p.get('to') || '');
+        var cc = campaign && campaigns[campaign] ? campaigns[campaign].cc : (p.get('cc') || '');
 
         if (to) {
-            var url = 'mailto:' + to + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
-            if (cc) url += '&cc=' + cc;
-            document.getElementById('link').href = url;
-            window.location.href = url;
+            document.getElementById('recipient').textContent = 'To: ' + to;
+
+            var mailtoUrl = 'mailto:' + to + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+            if (cc) mailtoUrl += '&cc=' + cc;
+
+            document.getElementById('link').href = mailtoUrl;
+            document.getElementById('copyurl').value = window.location.href;
+
+            // Try to open - may not work in Telegram browser
+            setTimeout(function() {
+                window.location.href = mailtoUrl;
+            }, 100);
         }
     </script>
 </body>
