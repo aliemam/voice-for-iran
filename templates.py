@@ -119,13 +119,13 @@ Generate a unique {platform} message in **{language_names.get(language, 'English
 
 ## Output Requirements
 - Write ONLY the message text (no explanations, no quotes around it)
-- Include @{target.get('handle', '')} mention
+- **START the message with @{target.get('handle', '')}** - the @mention MUST be at the very beginning
 - MUST include #IranProtests hashtag (REQUIRED)
 - Add 1 other hashtag from the list
 - CRITICAL: Stay UNDER {constraints['max_chars']} characters - count carefully!
 - Make it unique and authentic
 
-Generate the message now:"""
+Generate the message now (START with @{target.get('handle', '')}):"""
 
 
 # Special template for Trump-allied senators
@@ -195,11 +195,11 @@ Generate a unique, SUPER POLITE {platform} message in **{language_names.get(lang
 
 ## Output Requirements
 - Write ONLY the message text (no explanations)
-- Include @{target.get('handle', '')} mention
+- **START the message with @{target.get('handle', '')}** - the @mention MUST be at the very beginning
 - MUST include #IranProtests hashtag
 - Be SUPER polite - this is a respectful appeal to a Senator
 - Reference Trump's promise to support Iranian people
 - CRITICAL: Stay UNDER {constraints['max_chars']} characters
 - Make it unique but keep the respectful, grateful tone
 
-Generate the message now:"""
+Generate the message now (START with @{target.get('handle', '')}):"""
