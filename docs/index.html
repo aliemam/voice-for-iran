@@ -1,97 +1,28 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Send Email</title>
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            color: white;
-            min-height: 100vh;
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-        .container {
-            max-width: 500px;
-        }
-        h1 {
-            font-size: 1.5em;
-            margin-bottom: 20px;
-        }
-        .email-btn {
-            display: inline-block;
-            background: #4fc3f7;
-            color: #1a1a2e;
-            padding: 15px 40px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: bold;
-            font-size: 1.2em;
-            margin: 20px 0;
-            transition: background 0.3s;
-        }
-        .email-btn:hover {
-            background: #81d4fa;
-        }
-        .info {
-            margin-top: 20px;
-            padding: 15px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 10px;
-            font-size: 0.9em;
-        }
-        .error {
-            color: #ff6b6b;
-            margin-top: 20px;
-        }
-    </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Send Email</h1>
-        <p id="recipient"></p>
-
-        <a href="#" id="mailto-link" class="email-btn">Open Email App</a>
-
-        <div class="info">
-            <p>Click the button above to open your email app with the message ready to send.</p>
-        </div>
-
-        <p id="error" class="error" style="display:none;"></p>
-    </div>
-
+    <p>If email app did not open, <a href="#" id="link">click here</a></p>
+    <p id="debug"></p>
     <script>
-        // Get parameters from URL query string
-        const params = new URLSearchParams(window.location.search);
-        const to = params.get('to') || '';
-        const cc = params.get('cc') || '';
-        const subject = params.get('subject') || '';
-        const body = params.get('body') || '';
+        var p = new URLSearchParams(window.location.search);
+        var to = p.get('to') || '';
+        var cc = p.get('cc') || '';
+        var subject = p.get('subject') || '';
+        var body = p.get('body') || '';
 
-        if (!to) {
-            document.getElementById('error').textContent = 'Error: No recipient specified';
-            document.getElementById('error').style.display = 'block';
-            document.getElementById('mailto-link').style.display = 'none';
-        } else {
-            // Show recipient
-            document.getElementById('recipient').textContent = 'To: ' + to;
+        var url = 'mailto:' + to;
+        url += '?subject=' + encodeURIComponent(subject);
+        url += '&body=' + encodeURIComponent(body);
+        if (cc) url += '&cc=' + cc;
 
-            // Build mailto URL - don't encode the 'to' address
-            let mailtoUrl = 'mailto:' + to + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
-            if (cc) {
-                mailtoUrl += '&cc=' + cc;
-            }
+        document.getElementById('debug').textContent = 'To: ' + to;
+        document.getElementById('link').href = url;
 
-            // Set the link
-            document.getElementById('mailto-link').href = mailtoUrl;
-        }
+        window.location.href = url;
     </script>
 </body>
 </html>
