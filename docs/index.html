@@ -6,23 +6,37 @@
 </head>
 <body>
     <p>If email app did not open, <a href="#" id="link">click here</a></p>
-    <p id="debug"></p>
     <script>
+        // Campaign email addresses - add new campaigns here
+        var campaigns = {
+            'finland': {
+                to: 'viestinta.helsinki@poliisi.fi',
+                cc: ''
+            }
+        };
+
         var p = new URLSearchParams(window.location.search);
-        var to = p.get('to') || '';
-        var cc = p.get('cc') || '';
+        var campaign = p.get('campaign') || '';
         var subject = p.get('subject') || '';
         var body = p.get('body') || '';
 
-        var url = 'mailto:' + to;
-        url += '?subject=' + encodeURIComponent(subject);
-        url += '&body=' + encodeURIComponent(body);
-        if (cc) url += '&cc=' + cc;
+        // Get email from campaign or from URL
+        var to = '';
+        var cc = '';
+        if (campaign && campaigns[campaign]) {
+            to = campaigns[campaign].to;
+            cc = campaigns[campaign].cc;
+        } else {
+            to = p.get('to') || '';
+            cc = p.get('cc') || '';
+        }
 
-        document.getElementById('debug').textContent = 'To: ' + to;
-        document.getElementById('link').href = url;
-
-        window.location.href = url;
+        if (to) {
+            var url = 'mailto:' + to + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+            if (cc) url += '&cc=' + cc;
+            document.getElementById('link').href = url;
+            window.location.href = url;
+        }
     </script>
 </body>
 </html>
