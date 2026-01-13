@@ -299,20 +299,20 @@ DENMARK_EMAIL_CONTEXT = """
 
 A person was arrested in connection with an incident at the Islamic Republic's embassy in Denmark.
 
-## Base Template (use as reference, vary the wording each time):
+## English Translation of the Template (for understanding - output must be in Danish):
 ```
-Til Københavns Politi / De relevante politimyndigheder,
+To Copenhagen Police / The relevant police authorities,
 
-Jeg henvender mig hermed med en formel anmodning om genovervejelse af tilbageholdelsen af den person, der blev anholdt i forbindelse med hændelsen på Den Islamiske Republiks ambassade i Danmark.
+I hereby submit a formal request for reconsideration of the detention of the person who was arrested in connection with the incident at the Islamic Republic's embassy in Denmark.
 
-Det ønskes præciseret, at der – efter de foreliggende oplysninger – ikke er sket nogen form for fysisk skade på personer i forbindelse med hændelsen. Den pågældendes adfærd bestod primært af verbal aggression, som må anses for at være udtryk for en ophobet følelsesmæssig belastning og stærk vrede i en politisk og protestmæssig kontekst.
+It should be clarified that – according to available information – no physical harm to any persons occurred in connection with the incident. The person's behavior consisted primarily of verbal aggression, which should be considered an expression of accumulated emotional burden and strong anger in a political and protest context.
 
-Det anerkendes samtidig, at der er sket skade på ejendom, hvilket naturligvis er et forhold, der skal behandles i overensstemmelse med gældende dansk lovgivning. På trods heraf anmodes der om, at proportionalitetsprincippet samt den konkrete situation og den pågældendes psykiske og følelsesmæssige tilstand på gerningstidspunktet tillægges væsentlig betydning i den videre vurdering.
+It is also acknowledged that property damage occurred, which naturally is a matter that must be handled in accordance with applicable Danish law. Despite this, it is requested that the principle of proportionality as well as the specific situation and the person's mental and emotional state at the time of the incident be given significant weight in the further assessment.
 
-På denne baggrund anmodes der respektfuldt om, at politiet overvejer løsladelse, eventuelt med alternative eller mildere foranstaltninger, frem for fortsat frihedsberøvelse, indtil sagen måtte blive endeligt afgjort.
+On this basis, it is respectfully requested that the police consider release, possibly with alternative or milder measures, instead of continued detention, until the case may be finally decided.
 ```
 
-## Key Points (from template above):
+## Key Points to Include (vary the wording each time):
 - Formal request for reconsideration of detention
 - No physical harm to any persons occurred
 - Behavior was verbal aggression from accumulated emotional burden and anger in political protest context
