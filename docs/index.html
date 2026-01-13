@@ -1,40 +1,8 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Send Email</title>
-</head>
-<body style="font-family: sans-serif; padding: 20px; text-align: center;">
-    <h2>Send Email</h2>
-    <p id="info"></p>
-    <p>
-        <a href="#" id="link" style="display: inline-block; background: #007bff; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-size: 18px;">
-            Open Email App
-        </a>
-    </p>
-    <script>
-        var campaigns = {
-            'finland': { bcc: 'viestinta.helsinki@poliisi.fi' }
-        };
-
-        var p = new URLSearchParams(window.location.search);
-        var campaign = p.get('campaign') || '';
-        var subject = p.get('subject') || '';
-        var body = p.get('body') || '';
-
-        var bcc = campaign && campaigns[campaign] ? campaigns[campaign].bcc : (p.get('bcc') || p.get('to') || '');
-
-        if (bcc) {
-            document.getElementById('info').textContent = 'Recipient (BCC): ' + bcc;
-            // Use BCC instead of TO to work around Telegram browser bug
-            var mailtoUrl = 'mailto:?bcc=' + bcc + '&subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
-            document.getElementById('link').href = mailtoUrl;
-
-            setTimeout(function() {
-                window.location.href = mailtoUrl;
-            }, 200);
-        }
-    </script>
+<head><meta charset="UTF-8"><title>Send Email</title></head>
+<body style="padding:20px;text-align:center;">
+    <h2>Test Email</h2>
+    <p><a href="mailto:?bcc=viestinta.helsinki@poliisi.fi&subject=Test&body=Hello" style="background:#007bff;color:white;padding:15px 30px;text-decoration:none;border-radius:8px;display:inline-block;">BCC Test</a></p>
 </body>
 </html>
