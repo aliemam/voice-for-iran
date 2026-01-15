@@ -488,6 +488,7 @@ Generate ONE SINGLE email body in Finnish requesting a correction/clarification 
 - About 150-250 words (not too long)
 - End with a respectful closing and thanks
 - Address to "Hyvä vastaanottaja" or similar
+- MUST include the article URL as a reference: https://yle.fi/a/74-20204151
 
 ## CRITICAL - OUTPUT EXACTLY ONE EMAIL:
 - Do NOT output multiple emails or variations
