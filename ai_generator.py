@@ -6,7 +6,7 @@ Generates unique, personalized messages for social media.
 import re
 import anthropic
 from config import ANTHROPIC_API_KEY, CLAUDE_MODEL
-from templates import get_system_prompt, get_generation_prompt, get_trump_senator_prompt, get_finland_email_prompt, get_denmark_email_prompt, get_yle_email_prompt
+from templates import get_system_prompt, get_generation_prompt, get_trump_senator_prompt, get_finland_email_prompt, get_denmark_email_prompt, get_yle_email_prompt, get_yle_tweet_prompt
 
 
 class MessageGenerator:
@@ -303,3 +303,65 @@ Write only in Finnish. Be respectful, factual, and professional."""
         raise Exception(f"API Error: {str(e)}")
     except Exception as e:
         raise Exception(f"Error generating Yle email: {str(e)}")
+
+
+def generate_yle_tweet(target: dict, category: str) -> str:
+    """
+    Generates a unique Yle correction tweet for the given target.
+
+    Args:
+        target: Dict with target info (handle, name, description, language)
+        category: Category key (yle_journalists, finnish_leaders, eu_officials, hr_organizations)
+
+    Returns:
+        Generated tweet text (max 280 chars)
+    """
+    generator = get_generator()
+    user_prompt = get_yle_tweet_prompt(target, category)
+
+    language = target.get("language", "fi")
+    lang_name = "Finnish" if language == "fi" else "English"
+
+    system_prompt = f"""You are helping generate professional tweets in {lang_name} for a media correction campaign.
+Your role is to create unique, polite, factual tweets requesting correction of misleading journalism.
+Each tweet must be unique - vary the wording while keeping the same message.
+Write only in {lang_name}. Be respectful but clear."""
+
+    try:
+        response = generator.client.messages.create(
+            model=generator.model,
+            max_tokens=150,
+            system=system_prompt,
+            messages=[{"role": "user", "content": user_prompt}],
+        )
+
+        tweet = response.content[0].text.strip()
+
+        # Clean up any quotes that might wrap the message
+        if tweet.startswith('"') and tweet.endswith('"'):
+            tweet = tweet[1:-1]
+        if tweet.startswith("'") and tweet.endswith("'"):
+            tweet = tweet[1:-1]
+
+        # Ensure it starts with @handle
+        handle = target.get("handle", "")
+        if handle and not tweet.startswith(f"@{handle}"):
+            # Try to find and fix the mention
+            if f"@{handle}" in tweet:
+                # Move the mention to the start
+                tweet = tweet.replace(f"@{handle}", "").strip()
+                tweet = f"@{handle} {tweet}"
+            else:
+                # Add the mention at the start
+                tweet = f"@{handle} {tweet}"
+
+        # Truncate if over 280 chars (shouldn't happen but safety)
+        if len(tweet) > 280:
+            tweet = tweet[:277] + "..."
+
+        return tweet
+
+    except anthropic.APIError as e:
+        raise Exception(f"API Error: {str(e)}")
+    except Exception as e:
+        raise Exception(f"Error generating Yle tweet: {str(e)}")

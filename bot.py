@@ -19,7 +19,7 @@ from telegram.ext import (
 )
 
 from config import BOT_TOKEN, LANGUAGES, UI
-from targets import get_all_targets, get_targets_with_instagram, get_random_target, get_target_by_handle
+from targets import get_all_targets, get_targets_with_instagram, get_random_target, get_target_by_handle, get_yle_campaign_categories, get_yle_campaign_targets, get_yle_target_by_handle
 from ai_generator import generate_tweet, generate_instagram_caption, generate_finland_email
 from db import init_db, log_action
 
@@ -123,6 +123,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     )
 
     keyboard = [
+        [InlineKeyboardButton(UI["yle_twitter_button"], callback_data="yle_twitter")],
         [InlineKeyboardButton(UI["yle_button"], callback_data="yle_email")],
         [InlineKeyboardButton(UI["platforms"]["twitter"], callback_data="platform_twitter")],
         [InlineKeyboardButton(UI["platforms"]["instagram"], callback_data="platform_instagram")],
@@ -396,6 +397,7 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         context.user_data["selected_targets"] = []
 
         keyboard = [
+            [InlineKeyboardButton(UI["yle_twitter_button"], callback_data="yle_twitter")],
             [InlineKeyboardButton(UI["yle_button"], callback_data="yle_email")],
             [InlineKeyboardButton(UI["platforms"]["twitter"], callback_data="platform_twitter")],
             [InlineKeyboardButton(UI["platforms"]["instagram"], callback_data="platform_instagram")],
@@ -406,6 +408,108 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
             UI["welcome"] + "\n\n" + UI["select_platform"],
             reply_markup=reply_markup,
         )
+
+    # Yle Twitter Campaign - Show category selection
+    elif data == "yle_twitter":
+        await query.answer()
+        log_action(telegram_id=user.id, username=user.username, action="yle_twitter_start", target_handle="")
+
+        categories = UI["yle_twitter_categories"]
+        keyboard = [
+            [InlineKeyboardButton(categories["yle_journalists"], callback_data="yle_twitter_cat_yle_journalists")],
+            [InlineKeyboardButton(categories["finnish_leaders"], callback_data="yle_twitter_cat_finnish_leaders")],
+            [InlineKeyboardButton(categories["eu_officials"], callback_data="yle_twitter_cat_eu_officials")],
+            [InlineKeyboardButton(categories["hr_organizations"], callback_data="yle_twitter_cat_hr_organizations")],
+            [InlineKeyboardButton(UI["start_over"], callback_data="back_to_start")],
+        ]
+
+        await query.edit_message_text(
+            f"{UI['yle_twitter_title']}\n\n"
+            f"{UI['yle_twitter_situation']}\n\n"
+            f"{UI['yle_twitter_select_category']}",
+            reply_markup=InlineKeyboardMarkup(keyboard),
+        )
+
+    # Yle Twitter Campaign - Show targets in category
+    elif data.startswith("yle_twitter_cat_"):
+        await query.answer()
+        category = data.replace("yle_twitter_cat_", "")
+        targets = get_yle_campaign_targets(category)
+
+        keyboard = []
+        for target in targets:
+            keyboard.append([
+                InlineKeyboardButton(
+                    f"@{target['handle']} - {target['name']}",
+                    callback_data=f"yle_twitter_target_{target['handle']}"
+                )
+            ])
+        keyboard.append([InlineKeyboardButton(UI["back"], callback_data="yle_twitter")])
+        keyboard.append([InlineKeyboardButton(UI["start_over"], callback_data="back_to_start")])
+
+        await query.edit_message_text(
+            f"{UI['yle_twitter_title']}\n\n"
+            f"{UI['yle_twitter_select_target']}",
+            reply_markup=InlineKeyboardMarkup(keyboard),
+        )
+
+    # Yle Twitter Campaign - Generate tweet for target
+    elif data.startswith("yle_twitter_target_"):
+        await query.answer()
+        handle = data.replace("yle_twitter_target_", "")
+        target = get_yle_target_by_handle(handle)
+
+        if not target:
+            await query.edit_message_text("Target not found.")
+            return
+
+        category = target.get("category", "yle_journalists")
+        log_action(telegram_id=user.id, username=user.username, action="yle_twitter_generate", target_handle=handle)
+
+        # Show generating message
+        await query.edit_message_text(
+            f"{UI['yle_twitter_title']}\n\n"
+            f"🎯 {target['name']} (@{target['handle']})\n\n"
+            f"{UI['yle_twitter_generating']}"
+        )
+
+        try:
+            from ai_generator import generate_yle_tweet
+            tweet = generate_yle_tweet(target, category)
+
+            # Create Twitter intent URL
+            tweet_url = create_twitter_intent_url(tweet)
+
+            keyboard = [
+                [InlineKeyboardButton("🐦 بزن توییت", url=tweet_url)],
+                [InlineKeyboardButton("🔄 توییت جدید بساز", callback_data=f"yle_twitter_target_{handle}")],
+                [InlineKeyboardButton(UI["back"], callback_data=f"yle_twitter_cat_{category}")],
+                [InlineKeyboardButton(UI["start_over"], callback_data="back_to_start")],
+            ]
+
+            lang_label = "🇫🇮 فنلاندی" if target.get("language") == "fi" else "🇬🇧 انگلیسی"
+
+            await query.edit_message_text(
+                f"{UI['yle_twitter_title']}\n\n"
+                f"🎯 {target['name']} (@{target['handle']})\n"
+                f"📝 زبان: {lang_label}\n\n"
+                f"پیش‌نمایش توییت:\n"
+                f"```\n{tweet}\n```\n\n"
+                f"({len(tweet)} کاراکتر)",
+                reply_markup=InlineKeyboardMarkup(keyboard),
+                parse_mode="Markdown",
+            )
+        except Exception as e:
+            logger.error(f"Error generating Yle tweet: {e}")
+            keyboard = [
+                [InlineKeyboardButton("🔄 تلاش مجدد", callback_data=f"yle_twitter_target_{handle}")],
+                [InlineKeyboardButton(UI["start_over"], callback_data="back_to_start")],
+            ]
+            await query.edit_message_text(
+                f"{UI['yle_twitter_title']}\n\n"
+                f"❌ خطا در ساختن توییت. لطفاً دوباره تلاش کنید.",
+                reply_markup=InlineKeyboardMarkup(keyboard),
+            )
 
     # Yle Correction Email - Generate unique AI email
     elif data == "yle_email":

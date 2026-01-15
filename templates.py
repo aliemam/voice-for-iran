@@ -503,3 +503,100 @@ Generate ONE SINGLE email body in Finnish requesting a correction/clarification 
 Write ONLY ONE email body in Finnish (no quotes, no numbering, no explanations):"""
 
     return subject_prompt, body_prompt
+
+
+# Yle Twitter Campaign - Tweet Templates
+YLE_TWEET_CONTEXT = """
+## Context: Yle Article Correction Campaign (Twitter)
+
+A Yle article about Iran's Supreme Leader Ali Khamenei contains the misleading statement:
+"Khamenei ei ole kuitenkaan diktaattori" (Khamenei is not, however, a dictator)
+
+This framing is misleading because the Supreme Leader:
+- Has unchecked authority over Iran's military, judiciary, state media
+- Controls bodies that vet election candidates (Guardian Council)
+- Is not accountable to the public through any democratic mechanism
+- Is above public criticism (criticizing him can result in arrest)
+- Cannot be removed by the people
+- Has ruled for over 35 years with absolute power
+
+Article URL: https://yle.fi/a/74-20204151
+Misleading quote: "Khamenei ei ole kuitenkaan diktaattori"
+"""
+
+
+def get_yle_tweet_prompt(target: dict, category: str) -> str:
+    """
+    Creates the prompt for generating a Yle correction tweet.
+    Different prompts for different target categories.
+
+    Args:
+        target: Dict with target info (handle, name, description, language)
+        category: Category key (yle_journalists, finnish_leaders, eu_officials, hr_organizations)
+    """
+    language = target.get("language", "fi")
+    lang_name = "Finnish" if language == "fi" else "English"
+
+    # Category-specific instructions
+    if category == "yle_journalists":
+        category_instructions = """
+## Category: Yle Journalists (Direct Correction Request)
+- Request clarification/correction directly and professionally
+- Reference the specific misleading quote
+- Explain why the framing is problematic
+- Ask for context about Supreme Leader's actual power
+- Tone: Journalistic, calm, factual, respectful
+"""
+    elif category == "finnish_leaders":
+        category_instructions = """
+## Category: Finnish Political Leaders
+- Note how media framing can normalize authoritarian power
+- Ask them to pay attention to how Iran's leadership is described
+- Request support for human rights in Iran
+- Suggest they encourage Yle to clarify
+- Tone: Respectful, diplomatic, formal
+"""
+    elif category == "eu_officials":
+        category_instructions = """
+## Category: EU Officials
+- Highlight that even Nordic media can have problematic framing
+- Note the importance of precise language when describing authoritarian systems
+- Mention: "Precise language helps protect victims and combat normalization"
+- Tone: Academic, factual, European solidarity
+"""
+    else:  # hr_organizations
+        category_instructions = """
+## Category: Human Rights Organizations
+- Ask for their perspective on accurate framing of authoritarian leaders
+- Note that language matters in human rights documentation
+- Highlight the current situation in Iran (protests, deaths)
+- Tone: Professional, seeking expert validation
+"""
+
+    return f"""
+{YLE_TWEET_CONTEXT}
+
+{category_instructions}
+
+## Your Task
+Generate ONE unique tweet in **{lang_name}** addressed to @{target.get('handle', '')}.
+
+## Target Information
+- Name: {target.get('name', 'Unknown')}
+- Handle: @{target.get('handle', '')}
+- Role: {target.get('description', 'Public figure')}
+
+## STRICT REQUIREMENTS
+1. **MUST be UNDER 280 characters** - Twitter limit, count carefully!
+2. **START with @{target.get('handle', '')}**
+3. **NO hashtags** - keep it clean and professional
+4. Reference the Yle article or the misleading "not a dictator" claim
+5. Be polite but clear in requesting correction
+6. Language: {lang_name}
+
+## Output Format
+- Just the tweet text, nothing else
+- No quotes around the message
+- No explanations
+
+Generate ONE tweet (UNDER 280 chars, START with @{target.get('handle', '')}):"""

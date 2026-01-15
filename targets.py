@@ -181,3 +181,50 @@ def get_target_by_instagram(handle: str) -> Optional[dict]:
         if target.get("instagram") and target["instagram"].lower() == handle.lower():
             return target
     return None
+
+
+# Yle Article Correction Campaign - Twitter Targets
+YLE_CAMPAIGN_TARGETS = {
+    "yle_journalists": [
+        {"name": "Yle Uutiset", "handle": "yleuutiset", "description": "Yle News official account", "language": "fi"},
+        {"name": "Krista Taubert", "handle": "kristataubert", "description": "Yle Editor-in-Chief", "language": "fi"},
+        {"name": "Riikka Räisänen", "handle": "Riikka_Raisanen", "description": "Yle News Editor-in-Chief", "language": "fi"},
+    ],
+    "finnish_leaders": [
+        {"name": "Elina Valtonen", "handle": "elinavaltonen", "description": "Foreign Minister of Finland", "language": "fi"},
+        {"name": "Ulkoministeriö", "handle": "Ulkoministerio", "description": "Ministry of Foreign Affairs", "language": "fi"},
+        {"name": "Jouni Koskinen", "handle": "JohKoskinen", "description": "Foreign Affairs Committee Chair", "language": "fi"},
+        {"name": "Alexander Stubb", "handle": "alexstubb", "description": "President of Finland", "language": "fi"},
+        {"name": "Presidentin kanslia", "handle": "TPKanslia", "description": "Presidential Office", "language": "fi"},
+        {"name": "Suomen Eduskunta", "handle": "SuomenEduskunta", "description": "Finnish Parliament", "language": "fi"},
+    ],
+    "eu_officials": [
+        {"name": "Roberta Metsola", "handle": "EP_President", "description": "EU Parliament President", "language": "en"},
+        {"name": "Ursula von der Leyen", "handle": "vaboronderleyen", "description": "EU Commission President", "language": "en"},
+    ],
+    "hr_organizations": [
+        {"name": "Amnesty International", "handle": "amnesty", "description": "Human rights organization", "language": "en"},
+        {"name": "Human Rights Watch", "handle": "hrw", "description": "Human rights organization", "language": "en"},
+        {"name": "UN Human Rights", "handle": "UNHumanRights", "description": "UN Human Rights Office", "language": "en"},
+    ],
+}
+
+
+def get_yle_campaign_categories() -> list:
+    """Returns list of Yle campaign category keys."""
+    return list(YLE_CAMPAIGN_TARGETS.keys())
+
+
+def get_yle_campaign_targets(category: str) -> list:
+    """Returns targets in a Yle campaign category."""
+    return YLE_CAMPAIGN_TARGETS.get(category, [])
+
+
+def get_yle_target_by_handle(handle: str) -> Optional[dict]:
+    """Finds a Yle campaign target by their Twitter handle."""
+    for category, targets in YLE_CAMPAIGN_TARGETS.items():
+        for target in targets:
+            if target["handle"].lower() == handle.lower():
+                target["category"] = category
+                return target
+    return None
