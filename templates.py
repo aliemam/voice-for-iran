@@ -591,9 +591,10 @@ Generate ONE unique tweet in **{lang_name}** addressed to @{target.get('handle',
 1. **MUST be UNDER 280 characters** - Twitter limit, count carefully!
 2. **START with @{target.get('handle', '')}**
 3. **NO hashtags** - keep it clean and professional
-4. Reference the Yle article or the misleading "not a dictator" claim
-5. Be polite but clear in requesting correction
-6. Language: {lang_name}
+4. **MUST include the article URL: https://yle.fi/a/74-20204151**
+5. Reference the misleading "not a dictator" claim
+6. Be polite but clear in requesting correction
+7. Language: {lang_name}
 
 ## Output Format
 - Just the tweet text, nothing else
