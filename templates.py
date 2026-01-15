@@ -391,3 +391,115 @@ Generate ONE SINGLE email body in Danish requesting reconsideration of the deten
 Write ONLY ONE email body in Danish (no quotes, no numbering, no explanations):"""
 
     return subject_prompt, body_prompt
+
+
+# Yle Correction Email Template
+YLE_EMAIL_CONTEXT = """
+## Context: Yle Article Correction Request
+
+A Yle article about Iran's Supreme Leader Ali Khamenei states that he is "not a dictator" ("Khamenei ei ole kuitenkaan diktaattori").
+
+This framing is misleading because the Supreme Leader:
+- Has unchecked authority over Iran's military, judiciary, state media, and key political institutions
+- Directly or indirectly controls bodies that vet election candidates
+- Is not accountable to the public through any democratic mechanism
+- Is above public criticism (criticizing him can result in arrest and long prison sentences)
+- Cannot be removed by the people
+
+While Iran formally has a president and parliament, these institutions operate within strict limits imposed by unelected authorities loyal to the Supreme Leader.
+
+## Article URL
+https://yle.fi/a/74-20204151
+
+## Base Template (use as reference, vary the wording each time):
+```
+Hyvä vastaanottaja,
+
+Kirjoitan koskien Ylen artikkelia, jossa käsitellään Iranin hengellistä johtajaa Ali Khameneita ja todetaan, ettei häntä voida pitää diktaattorina.
+
+Haluan kunnioittavasti tuoda esiin, että tämä sanamuoto on harhaanjohtava. Käytännössä Iranin hengellisellä johtajalla on ylin ja valvomaton valta maan asevoimiin, oikeuslaitokseen, valtiolliseen mediaan sekä keskeisiin poliittisiin instituutioihin. Hänellä on ratkaiseva vaikutus siihen, ketkä ylipäätään voivat asettua ehdolle vaaleissa, eikä hän ole vastuussa kansalle demokraattisten mekanismien kautta.
+
+Vaikka Iranissa on muodollisesti presidentti ja parlamentti, näiden toimivalta on tiukasti rajattu. Ilman tätä kontekstia lukijalle voi syntyä virheellinen käsitys Iranin poliittisesta järjestelmästä ja vallankäytön todellisesta luonteesta.
+
+Tällä sanavalinnalla on erityistä merkitystä nyt, kun Iranissa on käynnissä laajoja mielenosoituksia ja turvallisuusjoukkojen toiminnan seurauksena tuhansien ihmisten kerrotaan kuolleen tai joutuneen pidätetyiksi. Vallankäytön pehmentäminen kielellisesti voi tahattomasti vähätellä tilanteen vakavuutta.
+
+Ylellä on tärkeä rooli luotettavana uutismediana, ja toivon, että artikkelin sanamuotoa harkitaan tältä osin uudelleen tai sitä täsmennetään, jotta yleisö saa mahdollisimman oikean kuvan Iranin todellisuudesta.
+
+Kiitos ajastanne ja huomiostanne.
+```
+
+## Key Points to Include (vary the wording each time):
+- Reference the specific Yle article about Khamenei
+- Point out the misleading claim that he is "not a dictator"
+- Explain the Supreme Leader's unchecked power over military, judiciary, media, elections
+- Note that president/parliament operate within strict limits
+- Mention current protests and thousands killed/detained
+- Request clarification or correction of the article
+- Acknowledge Yle's important role as public broadcaster
+
+## Tone:
+- EXTREMELY respectful and professional (this is to journalists/editors)
+- Factual and well-reasoned, not emotional or aggressive
+- Constructive criticism, not attacking
+- Academic/journalistic tone
+
+## Language: FINNISH (Suomi)
+The entire email MUST be written in Finnish. Use formal Finnish appropriate for media correspondence.
+"""
+
+
+def get_yle_email_prompt():
+    """
+    Creates the prompt for generating a unique Yle correction email.
+    Returns tuple of (subject_prompt, body_prompt)
+    """
+    subject_prompt = f"""
+{YLE_EMAIL_CONTEXT}
+
+## Your Task
+Generate ONE email subject line in Finnish for this correction request.
+
+## Requirements:
+- Write in Finnish (Suomi)
+- Keep it professional and respectful
+- About the misleading framing in the Yle article about Iran
+- Under 100 characters
+- Based on: "Huomio artikkelin harhaanjohtavaan sanamuotoon Iranin vallankäytöstä"
+
+## CRITICAL: Output EXACTLY ONE subject line.
+- Do NOT output multiple options
+- Do NOT number anything
+- Do NOT include explanations
+- Just write ONE single subject line
+
+Output ONE subject line now:"""
+
+    body_prompt = f"""
+{YLE_EMAIL_CONTEXT}
+
+## Your Task
+Generate ONE SINGLE email body in Finnish requesting a correction/clarification of the Yle article.
+
+## Requirements:
+- Write entirely in Finnish (Suomi)
+- Be respectful and professional (this is to journalists/editors)
+- Include the key points but vary the wording from the template
+- Use formal, academic tone appropriate for media correspondence
+- About 150-250 words (not too long)
+- End with a respectful closing and thanks
+- Address to "Hyvä vastaanottaja" or similar
+
+## CRITICAL - OUTPUT EXACTLY ONE EMAIL:
+- Do NOT output multiple emails or variations
+- Do NOT number anything (no "Email 1:", "Email 2:", etc.)
+- Do NOT include explanations or options
+- Just write ONE SINGLE email body
+
+## CRITICAL - NO PLACEHOLDERS:
+- Do NOT use any placeholders like <Nimi>, <Name>, <Signature>, etc.
+- The email must be READY TO SEND as-is, no editing needed
+- Do NOT include a signature line - the sender will add their own
+
+Write ONLY ONE email body in Finnish (no quotes, no numbering, no explanations):"""
+
+    return subject_prompt, body_prompt

@@ -85,6 +85,24 @@ På denne baggrund anmodes der respektfuldt om, at politiet overvejer løsladels
 DENMARK_EMAIL_SUBJECT = "Anmodning om genovervejelse og løsladelse – politimæssig vurdering"
 DENMARK_EMAIL_TO = "udenrigsminister@um.dk,um@um.dk"
 
+# Yle Correction Email - Misleading article about Khamenei
+YLE_EMAIL_BODY = """Hyvä vastaanottaja,
+
+Kirjoitan koskien Ylen artikkelia, jossa käsitellään Iranin hengellistä johtajaa Ali Khameneita ja todetaan, ettei häntä voida pitää diktaattorina.
+
+Haluan kunnioittavasti tuoda esiin, että tämä sanamuoto on harhaanjohtava. Käytännössä Iranin hengellisellä johtajalla on ylin ja valvomaton valta maan asevoimiin, oikeuslaitokseen, valtiolliseen mediaan sekä keskeisiin poliittisiin instituutioihin. Hänellä on ratkaiseva vaikutus siihen, ketkä ylipäätään voivat asettua ehdolle vaaleissa, eikä hän ole vastuussa kansalle demokraattisten mekanismien kautta.
+
+Vaikka Iranissa on muodollisesti presidentti ja parlamentti, näiden toimivalta on tiukasti rajattu. Ilman tätä kontekstia lukijalle voi syntyä virheellinen käsitys Iranin poliittisesta järjestelmästä ja vallankäytön todellisesta luonteesta.
+
+Tällä sanavalinnalla on erityistä merkitystä nyt, kun Iranissa on käynnissä laajoja mielenosoituksia ja turvallisuusjoukkojen toiminnan seurauksena tuhansien ihmisten kerrotaan kuolleen tai joutuneen pidätetyiksi. Vallankäytön pehmentäminen kielellisesti voi tahattomasti vähätellä tilanteen vakavuutta.
+
+Ylellä on tärkeä rooli luotettavana uutismediana, ja toivon, että artikkelin sanamuotoa harkitaan tältä osin uudelleen tai sitä täsmennetään, jotta yleisö saa mahdollisimman oikean kuvan Iranin todellisuudesta.
+
+Kiitos ajastanne ja huomiostanne."""
+
+YLE_EMAIL_SUBJECT = "Huomio artikkelin harhaanjohtavaan sanamuotoon Iranin vallankäytöstä"
+YLE_EMAIL_TO = "oikaisu.verkko@yle.fi,yleinfo@yle.fi,uutiset@yle.fi"
+
 
 def is_valid_handle_format(handle: str) -> bool:
     """Check if a Twitter handle has valid format."""
@@ -105,6 +123,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     )
 
     keyboard = [
+        [InlineKeyboardButton(UI["yle_button"], callback_data="yle_email")],
         [InlineKeyboardButton(UI["platforms"]["twitter"], callback_data="platform_twitter")],
         [InlineKeyboardButton(UI["platforms"]["instagram"], callback_data="platform_instagram")],
     ]
@@ -377,6 +396,7 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         context.user_data["selected_targets"] = []
 
         keyboard = [
+            [InlineKeyboardButton(UI["yle_button"], callback_data="yle_email")],
             [InlineKeyboardButton(UI["platforms"]["twitter"], callback_data="platform_twitter")],
             [InlineKeyboardButton(UI["platforms"]["instagram"], callback_data="platform_instagram")],
         ]
@@ -386,6 +406,62 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
             UI["welcome"] + "\n\n" + UI["select_platform"],
             reply_markup=reply_markup,
         )
+
+    # Yle Correction Email - Generate unique AI email
+    elif data == "yle_email":
+        await query.answer()
+        log_action(telegram_id=user.id, username=user.username, action="yle_email", target_handle=YLE_EMAIL_TO)
+
+        # Show generating message
+        await query.edit_message_text(
+            f"{UI['yle_title']}\n\n"
+            f"{UI['yle_situation']}\n\n"
+            f"{UI['yle_generating']}"
+        )
+
+        try:
+            # Generate unique email using AI
+            from ai_generator import generate_yle_email
+            subject, body = generate_yle_email()
+
+            # Build URL with GitHub Pages redirect
+            email_page_base = "https://aliemam.github.io/voice-for-iran/"
+            bcc_encoded = urllib.parse.quote(YLE_EMAIL_TO, safe='')
+            sub_encoded = urllib.parse.quote_plus(subject)
+            body_encoded = urllib.parse.quote_plus(body)
+            email_page_url = f"{email_page_base}?to=&bcc={bcc_encoded}&sub={sub_encoded}&body={body_encoded}"
+
+            keyboard = [
+                [InlineKeyboardButton("📧 ارسال ایمیل به Yle", url=email_page_url)],
+                [InlineKeyboardButton(UI["start_over"], callback_data="back_to_start")],
+            ]
+
+            await query.edit_message_text(
+                f"{UI['yle_title']}\n\n"
+                f"{UI['yle_email_explain']}\n\n"
+                "✅ ایمیل منحصربه‌فرد آماده است! روی دکمه زیر کلیک کنید:",
+                reply_markup=InlineKeyboardMarkup(keyboard),
+            )
+        except Exception as e:
+            logger.error(f"Error generating Yle email: {e}")
+            # Fallback to static template
+            email_page_base = "https://aliemam.github.io/voice-for-iran/"
+            bcc_encoded = urllib.parse.quote(YLE_EMAIL_TO, safe='')
+            sub_encoded = urllib.parse.quote_plus(YLE_EMAIL_SUBJECT)
+            body_encoded = urllib.parse.quote_plus(YLE_EMAIL_BODY)
+            email_page_url = f"{email_page_base}?to=&bcc={bcc_encoded}&sub={sub_encoded}&body={body_encoded}"
+
+            keyboard = [
+                [InlineKeyboardButton("📧 ارسال ایمیل به Yle", url=email_page_url)],
+                [InlineKeyboardButton(UI["start_over"], callback_data="back_to_start")],
+            ]
+
+            await query.edit_message_text(
+                f"{UI['yle_title']}\n\n"
+                f"{UI['yle_email_explain']}\n\n"
+                "✅ ایمیل آماده است! روی دکمه زیر کلیک کنید:",
+                reply_markup=InlineKeyboardMarkup(keyboard),
+            )
 
     # Finland Emergency - Generate unique AI email
     elif data == "finland_emergency":
