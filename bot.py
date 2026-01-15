@@ -482,7 +482,6 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
 
             keyboard = [
                 [InlineKeyboardButton("🐦 بزن توییت", url=tweet_url)],
-                [InlineKeyboardButton("🔄 توییت جدید بساز", callback_data=f"yle_twitter_target_{handle}")],
                 [InlineKeyboardButton(UI["back"], callback_data=f"yle_twitter_cat_{category}")],
                 [InlineKeyboardButton(UI["start_over"], callback_data="back_to_start")],
             ]
