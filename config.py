@@ -9,7 +9,7 @@ BOT_TOKEN = os.getenv("BOT_TOKEN")
 # Anthropic
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
 CLAUDE_MODEL = "claude-3-haiku-20240307"
-CLAUDE_MODEL_SMART = "claude-sonnet-4-20250514"  # Smarter model for complex tasks
+CLAUDE_MODEL_SMART = "claude-opus-4-20250514"  # Smartest model for roasting
 
 # Database
 DB_PATH = os.path.join(os.path.dirname(__file__), "data", "usage.db")
