@@ -125,8 +125,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
     keyboard = [
         [InlineKeyboardButton(UI["smart_reply_button"], callback_data="smart_reply")],
-        [InlineKeyboardButton(UI["yle_twitter_button"], callback_data="yle_twitter")],
-        [InlineKeyboardButton(UI["yle_button"], callback_data="yle_email")],
         [InlineKeyboardButton(UI["platforms"]["twitter"], callback_data="platform_twitter")],
         [InlineKeyboardButton(UI["platforms"]["instagram"], callback_data="platform_instagram")],
     ]
@@ -457,8 +455,6 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
 
         keyboard = [
             [InlineKeyboardButton(UI["smart_reply_button"], callback_data="smart_reply")],
-            [InlineKeyboardButton(UI["yle_twitter_button"], callback_data="yle_twitter")],
-            [InlineKeyboardButton(UI["yle_button"], callback_data="yle_email")],
             [InlineKeyboardButton(UI["platforms"]["twitter"], callback_data="platform_twitter")],
             [InlineKeyboardButton(UI["platforms"]["instagram"], callback_data="platform_instagram")],
         ]
