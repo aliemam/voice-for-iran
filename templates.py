@@ -653,8 +653,15 @@ def get_smart_reply_prompt(tweet_text: str, username: str = None) -> str:
         username_context = f"""
 ## Author Information
 - Username: @{username}
-- Analyze their framing and rhetoric to infer their stance
-- DO NOT invent facts about them - only analyze what's evident from the tweet"""
+- If you can infer their stance from the tweet, use it
+- DO NOT invent facts about them - only analyze what's evident from the tweet
+- If you cannot determine anything about them, that's fine - focus on the tweet content"""
+    else:
+        username_context = """
+## Author Information
+- Username: Unknown
+- Focus entirely on the tweet content, framing, and rhetoric
+- Do NOT worry about who wrote it - analyze what was written"""
 
     return f"""## Input Tweet
 {username_context}
@@ -664,6 +671,13 @@ Tweet content:
 
 ## Your Task
 Generate ONE intelligent, ironic reply to this tweet.
+
+## IMPORTANT: No Username? No Problem!
+If you don't know the author or cannot analyze their profile, simply focus on:
+- The tweet's content and claims
+- The logical structure and any fallacies
+- The framing and rhetoric used
+You do NOT need author information to craft an excellent ironic response.
 
 ## Analysis Steps (internal, do not output)
 1. Identify the language of the tweet
