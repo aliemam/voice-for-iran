@@ -20,7 +20,7 @@ from telegram.ext import (
 
 from config import BOT_TOKEN, LANGUAGES, UI
 from targets import get_all_targets, get_targets_with_instagram, get_random_target, get_target_by_handle, get_yle_campaign_categories, get_yle_campaign_targets, get_yle_target_by_handle
-from ai_generator import generate_tweet, generate_instagram_caption, generate_finland_email
+from ai_generator import generate_tweet, generate_instagram_caption, generate_finland_email, generate_smart_reply
 from db import init_db, log_action
 
 # Set up logging
@@ -33,6 +33,7 @@ logger = logging.getLogger(__name__)
 # States for conversation
 STATE_NONE = 0
 STATE_WAITING_CUSTOM_HANDLE = 1
+STATE_WAITING_SMART_REPLY = 2
 
 
 def create_twitter_intent_url(text: str) -> str:
@@ -123,6 +124,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     )
 
     keyboard = [
+        [InlineKeyboardButton(UI["smart_reply_button"], callback_data="smart_reply")],
         [InlineKeyboardButton(UI["yle_twitter_button"], callback_data="yle_twitter")],
         [InlineKeyboardButton(UI["yle_button"], callback_data="yle_email")],
         [InlineKeyboardButton(UI["platforms"]["twitter"], callback_data="platform_twitter")],
@@ -185,6 +187,63 @@ async def handle_text_message(update: Update, context: ContextTypes.DEFAULT_TYPE
             "می‌خواهید هدف دیگری اضافه کنید؟",
             reply_markup=InlineKeyboardMarkup(keyboard),
         )
+
+    elif state == STATE_WAITING_SMART_REPLY:
+        # User sent a tweet to respond to
+        context.user_data["state"] = STATE_NONE
+
+        # Parse input: check if first line is a username
+        lines = text.split("\n", 1)
+        username = None
+        tweet_text = text
+
+        if len(lines) >= 2 and lines[0].strip().startswith("@"):
+            username = lines[0].strip().lstrip("@")
+            tweet_text = lines[1].strip()
+        elif lines[0].strip().startswith("@") and " " in lines[0]:
+            # Username at start of single line: @user rest of tweet
+            parts = lines[0].split(" ", 1)
+            if len(parts) == 2:
+                username = parts[0].lstrip("@")
+                tweet_text = parts[1].strip()
+
+        # Show generating message
+        generating_msg = await update.message.reply_text(UI["smart_reply_generating"])
+
+        try:
+            # Generate smart reply
+            reply = generate_smart_reply(tweet_text, username)
+
+            log_action(
+                telegram_id=user.id,
+                username=user.username,
+                action="smart_reply_generate",
+                target_handle=username or "unknown",
+            )
+
+            keyboard = [
+                [InlineKeyboardButton(UI["start_over"], callback_data="back_to_start")],
+            ]
+
+            await generating_msg.edit_text(
+                f"{UI['smart_reply_title']}\n\n"
+                f"📥 توییت اصلی:\n```\n{tweet_text[:200]}{'...' if len(tweet_text) > 200 else ''}\n```\n\n"
+                f"{UI['smart_reply_preview']}\n```\n{reply}\n```\n\n"
+                f"({len(reply)} کاراکتر)",
+                reply_markup=InlineKeyboardMarkup(keyboard),
+                parse_mode="Markdown",
+            )
+
+        except Exception as e:
+            logger.error(f"Error generating smart reply: {e}")
+            keyboard = [
+                [InlineKeyboardButton(UI["start_over"], callback_data="back_to_start")],
+            ]
+            await generating_msg.edit_text(
+                f"{UI['smart_reply_title']}\n\n"
+                f"❌ خطا در ساختن پاسخ. لطفاً دوباره تلاش کنید.\n\n{str(e)}",
+                reply_markup=InlineKeyboardMarkup(keyboard),
+            )
 
 
 async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -397,6 +456,7 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         context.user_data["selected_targets"] = []
 
         keyboard = [
+            [InlineKeyboardButton(UI["smart_reply_button"], callback_data="smart_reply")],
             [InlineKeyboardButton(UI["yle_twitter_button"], callback_data="yle_twitter")],
             [InlineKeyboardButton(UI["yle_button"], callback_data="yle_email")],
             [InlineKeyboardButton(UI["platforms"]["twitter"], callback_data="platform_twitter")],
@@ -407,6 +467,21 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         await query.edit_message_text(
             UI["welcome"] + "\n\n" + UI["select_platform"],
             reply_markup=reply_markup,
+        )
+
+    # Smart Reply - Ask user to send tweet
+    elif data == "smart_reply":
+        await query.answer()
+        context.user_data["state"] = STATE_WAITING_SMART_REPLY
+        log_action(telegram_id=user.id, username=user.username, action="smart_reply_start", target_handle="")
+
+        keyboard = [
+            [InlineKeyboardButton(UI["smart_reply_cancel"], callback_data="back_to_start")],
+        ]
+
+        await query.edit_message_text(
+            f"{UI['smart_reply_title']}\n\n{UI['smart_reply_instruction']}",
+            reply_markup=InlineKeyboardMarkup(keyboard),
         )
 
     # Yle Twitter Campaign - Show category selection

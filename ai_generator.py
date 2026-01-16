@@ -5,8 +5,8 @@ Generates unique, personalized messages for social media.
 
 import re
 import anthropic
-from config import ANTHROPIC_API_KEY, CLAUDE_MODEL
-from templates import get_system_prompt, get_generation_prompt, get_trump_senator_prompt, get_finland_email_prompt, get_denmark_email_prompt, get_yle_email_prompt, get_yle_tweet_prompt
+from config import ANTHROPIC_API_KEY, CLAUDE_MODEL, CLAUDE_MODEL_SMART
+from templates import get_system_prompt, get_generation_prompt, get_trump_senator_prompt, get_finland_email_prompt, get_denmark_email_prompt, get_yle_email_prompt, get_yle_tweet_prompt, SMART_REPLY_SYSTEM_PROMPT, get_smart_reply_prompt
 
 
 class MessageGenerator:
@@ -365,3 +365,50 @@ Write only in {lang_name}. Be respectful but clear."""
         raise Exception(f"API Error: {str(e)}")
     except Exception as e:
         raise Exception(f"Error generating Yle tweet: {str(e)}")
+
+
+def generate_smart_reply(tweet_text: str, username: str = None) -> str:
+    """
+    Generates an intelligent, ironic reply to a tweet using the smarter Claude model.
+
+    Args:
+        tweet_text: The tweet content to respond to
+        username: Optional Twitter username of the author (without @)
+
+    Returns:
+        Generated reply text (max 280 chars)
+    """
+    generator = get_generator()
+    user_prompt = get_smart_reply_prompt(tweet_text, username)
+
+    try:
+        response = generator.client.messages.create(
+            model=CLAUDE_MODEL_SMART,  # Use smarter model for this task
+            max_tokens=300,
+            system=SMART_REPLY_SYSTEM_PROMPT,
+            messages=[{"role": "user", "content": user_prompt}],
+        )
+
+        reply = response.content[0].text.strip()
+
+        # Clean up any quotes that might wrap the message
+        if reply.startswith('"') and reply.endswith('"'):
+            reply = reply[1:-1]
+        if reply.startswith("'") and reply.endswith("'"):
+            reply = reply[1:-1]
+
+        # Remove any "Reply:" prefix if present
+        for prefix in ["Reply:", "پاسخ:", "Response:"]:
+            if reply.startswith(prefix):
+                reply = reply[len(prefix):].strip()
+
+        # Truncate if over 280 chars (safety net)
+        if len(reply) > 280:
+            reply = reply[:277] + "..."
+
+        return reply
+
+    except anthropic.APIError as e:
+        raise Exception(f"API Error: {str(e)}")
+    except Exception as e:
+        raise Exception(f"Error generating smart reply: {str(e)}")
