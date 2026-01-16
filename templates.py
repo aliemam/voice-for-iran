@@ -704,26 +704,39 @@ SMART_REPLY_SYSTEM_PROMPT = """تو یه ایرانی زبون‌دار و تی�
 ایموجی طنز: 🤡 😂 👏 💀 🔥"""
 
 
-def get_smart_reply_prompt(tweet_text: str, username: str = None) -> str:
+def get_smart_reply_prompt(tweet_text: str, username: str = None, rejected_replies: list = None) -> str:
     """
     Creates the prompt for generating a smart reply to a tweet.
 
     Args:
         tweet_text: The tweet content to respond to
         username: Optional Twitter username of the author
+        rejected_replies: List of previously rejected replies
     """
     username_part = f"نویسنده: @{username}" if username else "نویسنده: نامشخص"
+    rejected = rejected_replies or []
+
+    rejected_section = ""
+    if rejected:
+        rejected_section = f"""
+⚠️ کاربر این جواب‌ها رو رد کرده چون به اندازه کافی تند نبودن:
+{chr(10).join(f'- "{r}"' for r in rejected)}
+
+این بار باید:
+- تندتر و گزنده‌تر بزنی
+- بیشتر بسوزونی
+- خفن‌تر روست کنی
+- یه چیز کاملاً متفاوت بگی
+"""
 
     return f"""توییت:
 {username_part}
 "{tweet_text}"
-
-یه جواب کنایه‌دار و باهوش بنویس.
+{rejected_section}
+یه جواب روست و سوزنده بنویس.
 
 قوانین:
 - حداکثر ۲۸۰ کاراکتر
-- بدون ایموجی
-- بدون هشتگ
-- بدون شعار
-- بدون فحش
-- فقط متن جواب، هیچی دیگه"""
+- یک جمله فقط
+- بدون هشتگ و شعار
+- فقط متن جواب"""

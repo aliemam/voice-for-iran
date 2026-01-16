@@ -210,7 +210,14 @@ async def handle_text_message(update: Update, context: ContextTypes.DEFAULT_TYPE
 
         try:
             # Generate smart reply
-            reply = generate_smart_reply(tweet_text, username)
+            rejected = context.user_data.get("smart_reply_rejected", [])
+            reply = generate_smart_reply(tweet_text, username, rejected)
+
+            # Store data for potential regeneration
+            context.user_data["smart_reply_tweet"] = tweet_text
+            context.user_data["smart_reply_username"] = username
+            context.user_data["smart_reply_rejected"] = rejected + [reply]
+            context.user_data["smart_reply_current"] = reply
 
             log_action(
                 telegram_id=user.id,
@@ -219,15 +226,26 @@ async def handle_text_message(update: Update, context: ContextTypes.DEFAULT_TYPE
                 target_handle=username or "unknown",
             )
 
+            # Build message with all previous rejected replies
+            msg_text = f"{UI['smart_reply_title']}\n\n"
+            msg_text += f"📥 توییت اصلی:\n`{tweet_text[:200]}{'...' if len(tweet_text) > 200 else ''}`\n\n"
+
+            if len(rejected) > 0:
+                msg_text += "❌ رد شده‌ها:\n"
+                for i, rej in enumerate(rejected, 1):
+                    msg_text += f"{i}. ~{rej}~\n"
+                msg_text += "\n"
+
+            msg_text += f"✅ پیشنهاد جدید:\n`{reply}`\n\n"
+            msg_text += f"({len(reply)} کاراکتر)"
+
             keyboard = [
+                [InlineKeyboardButton("🔥 تند‌تر بزن!", callback_data="smart_reply_regen")],
                 [InlineKeyboardButton(UI["start_over"], callback_data="back_to_start")],
             ]
 
             await generating_msg.edit_text(
-                f"{UI['smart_reply_title']}\n\n"
-                f"📥 توییت اصلی:\n```\n{tweet_text[:200]}{'...' if len(tweet_text) > 200 else ''}\n```\n\n"
-                f"{UI['smart_reply_preview']}\n```\n{reply}\n```\n\n"
-                f"({len(reply)} کاراکتر)",
+                msg_text,
                 reply_markup=InlineKeyboardMarkup(keyboard),
                 parse_mode="Markdown",
             )
@@ -469,6 +487,7 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     elif data == "smart_reply":
         await query.answer()
         context.user_data["state"] = STATE_WAITING_SMART_REPLY
+        context.user_data["smart_reply_rejected"] = []  # Reset rejected list
         log_action(telegram_id=user.id, username=user.username, action="smart_reply_start", target_handle="")
 
         keyboard = [
@@ -479,6 +498,67 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
             f"{UI['smart_reply_title']}\n\n{UI['smart_reply_instruction']}",
             reply_markup=InlineKeyboardMarkup(keyboard),
         )
+
+    # Smart Reply - Regenerate (harsher)
+    elif data == "smart_reply_regen":
+        await query.answer("🔥 در حال ساختن نسخه تندتر...")
+
+        tweet_text = context.user_data.get("smart_reply_tweet", "")
+        username = context.user_data.get("smart_reply_username")
+        rejected = context.user_data.get("smart_reply_rejected", [])
+
+        if not tweet_text:
+            await query.edit_message_text(
+                "❌ خطا: لطفاً دوباره شروع کنید.",
+                reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton(UI["start_over"], callback_data="back_to_start")]]),
+            )
+            return
+
+        try:
+            # Generate new reply with rejected ones
+            reply = generate_smart_reply(tweet_text, username, rejected)
+
+            # Update rejected list
+            context.user_data["smart_reply_rejected"] = rejected + [reply]
+            context.user_data["smart_reply_current"] = reply
+
+            log_action(
+                telegram_id=user.id,
+                username=user.username,
+                action="smart_reply_regen",
+                target_handle=username or "unknown",
+            )
+
+            # Build message with all previous rejected replies
+            msg_text = f"{UI['smart_reply_title']}\n\n"
+            msg_text += f"📥 توییت اصلی:\n`{tweet_text[:150]}{'...' if len(tweet_text) > 150 else ''}`\n\n"
+
+            if len(rejected) > 0:
+                msg_text += "❌ رد شده‌ها:\n"
+                for i, rej in enumerate(rejected, 1):
+                    msg_text += f"{i}. ~{rej}~\n"
+                msg_text += "\n"
+
+            msg_text += f"✅ پیشنهاد جدید:\n`{reply}`\n\n"
+            msg_text += f"({len(reply)} کاراکتر)"
+
+            keyboard = [
+                [InlineKeyboardButton("🔥 تند‌تر بزن!", callback_data="smart_reply_regen")],
+                [InlineKeyboardButton(UI["start_over"], callback_data="back_to_start")],
+            ]
+
+            await query.edit_message_text(
+                msg_text,
+                reply_markup=InlineKeyboardMarkup(keyboard),
+                parse_mode="Markdown",
+            )
+
+        except Exception as e:
+            logger.error(f"Error regenerating smart reply: {e}")
+            await query.edit_message_text(
+                f"{UI['smart_reply_title']}\n\n❌ خطا: {str(e)}",
+                reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton(UI["start_over"], callback_data="back_to_start")]]),
+            )
 
     # Yle Twitter Campaign - Show category selection
     elif data == "yle_twitter":

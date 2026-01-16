@@ -367,19 +367,20 @@ Write only in {lang_name}. Be respectful but clear."""
         raise Exception(f"Error generating Yle tweet: {str(e)}")
 
 
-def generate_smart_reply(tweet_text: str, username: str = None) -> str:
+def generate_smart_reply(tweet_text: str, username: str = None, rejected_replies: list = None) -> str:
     """
     Generates an intelligent, ironic reply to a tweet using the smarter Claude model.
 
     Args:
         tweet_text: The tweet content to respond to
         username: Optional Twitter username of the author (without @)
+        rejected_replies: List of previously rejected replies (to make it harsher)
 
     Returns:
         Generated reply text (max 280 chars)
     """
     generator = get_generator()
-    user_prompt = get_smart_reply_prompt(tweet_text, username)
+    user_prompt = get_smart_reply_prompt(tweet_text, username, rejected_replies or [])
 
     try:
         response = generator.client.messages.create(
