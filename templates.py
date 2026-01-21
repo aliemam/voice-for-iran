@@ -16,12 +16,9 @@ The Iranian clerical regime has imposed a total internet blackout and begun wide
 - The regime is hiding a massacre from the world
 
 ## Key Hashtags
-IMPORTANT: Always include #IranProtests in every message. Pick 1 other:
-- #IranProtests - REQUIRED in every message
-- #FreeIran - Call for freedom
-- #BeOurVoice - Call for international support
-- #جاویدشاه - Long live the king (Persian)
-- #KingRezaPahlavi - Support for Reza Pahlavi
+IMPORTANT: Always include BOTH of these hashtags in every message:
+- #R2pforiran - REQUIRED (Responsibility to Protect for Iran)
+- #iranmassacre - REQUIRED (documenting the massacre)
 
 ## Tone Guidelines
 - Urgent but not alarmist
@@ -42,12 +39,12 @@ IMPORTANT: Always include #IranProtests in every message. Pick 1 other:
 PLATFORM_CONSTRAINTS = {
     "twitter": {
         "max_chars": 280,
-        "format": "Short, punchy, include @mention and hashtags. MUST include #IranProtests",
-        "notes": "FREE account limit is 280 chars - DO NOT EXCEED. Include @mention + #IranProtests + 1 other hashtag"
+        "format": "Short, punchy, include @mention and hashtags. MUST include #R2pforiran #iranmassacre",
+        "notes": "FREE account limit is 280 chars - DO NOT EXCEED. Include @mention + #R2pforiran + #iranmassacre"
     },
     "instagram": {
         "max_chars": 1000,
-        "format": "For DM/comment. Include hashtags. MUST include #IranProtests",
+        "format": "For DM/comment. Include hashtags. MUST include #R2pforiran #iranmassacre",
         "notes": "DM limit is 1000 chars - DO NOT EXCEED. Can be more detailed than Twitter but stay under limit"
     }
 }
@@ -120,11 +117,11 @@ Generate a unique {platform} message in **{language_names.get(language, 'English
 ## Output Requirements
 1. **MUST be UNDER {constraints['max_chars']} characters** - THIS IS NON-NEGOTIABLE
 2. START with @{target.get('handle', '')}
-3. Include #IranProtests + 1 other hashtag
+3. MUST include BOTH hashtags: #R2pforiran #iranmassacre
 4. Keep it SHORT - sacrifice detail to fit the limit
 5. No quotes around the message
 
-Generate a SHORT message (UNDER {constraints['max_chars']} chars, START with @{target.get('handle', '')}):"""
+Generate a SHORT message (UNDER {constraints['max_chars']} chars, START with @{target.get('handle', '')}, include #R2pforiran #iranmassacre):"""
 
 
 # Special template for Trump-allied senators
@@ -196,11 +193,11 @@ Generate a unique, SUPER POLITE {platform} message in **{language_names.get(lang
 ## Output Requirements
 1. **MUST be UNDER {constraints['max_chars']} characters** - THIS IS NON-NEGOTIABLE
 2. START with @{target.get('handle', '')}
-3. Include #IranProtests
+3. MUST include BOTH hashtags: #R2pforiran #iranmassacre
 4. Be polite, appeal to Trump's promise
 5. Keep it SHORT - sacrifice detail to fit the limit
 
-Generate a SHORT message (UNDER {constraints['max_chars']} chars, START with @{target.get('handle', '')}):"""
+Generate a SHORT message (UNDER {constraints['max_chars']} chars, START with @{target.get('handle', '')}, include #R2pforiran #iranmassacre):"""
 
 
 # Finland Emergency Email Template

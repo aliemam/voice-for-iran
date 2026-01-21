@@ -963,9 +963,12 @@ async def show_message(query, context: ContextTypes.DEFAULT_TYPE, index: int) ->
 
     await query.edit_message_text(
         f"برای {target_name}:\n{target_desc}\n\n"
-        f"{UI['tweet_preview']}\n\n{message}\n\n({len(message)} کاراکتر)\n\n"
+        f"{UI['tweet_preview']}\n\n"
+        f"```\n{message}\n```\n\n"
+        f"({len(message)} کاراکتر)\n\n"
         f"{UI['customize_note']}",
         reply_markup=InlineKeyboardMarkup(keyboard),
+        parse_mode="Markdown",
     )
 
 
