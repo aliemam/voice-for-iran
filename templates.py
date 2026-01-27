@@ -601,6 +601,320 @@ Generate ONE unique tweet in **{lang_name}** addressed to @{target.get('handle',
 Generate ONE tweet (UNDER 280 chars, START with @{target.get('handle', '')}):"""
 
 
+# Sciences Po (Kevan Gafaïti) Email Template
+SCIENCESPO_EMAIL_CONTEXT = """
+## Context: Sciences Po Faculty Member - Kevan Gafaïti
+
+A faculty member at Sciences Po (Kevan Gafaïti) has publicly taken positions that appear to minimize, justify, or reframe the actions of the Islamic Republic of Iran during the recent repression of nationwide protests (January 2026).
+
+These protests have been widely documented by international organizations, independent media, and human rights NGOs as involving large-scale violence against civilians, including arbitrary arrests, torture, and the killing of protesters.
+
+The concern is the use of academic authority and institutional credibility to promote narratives that align closely with state propaganda of a regime currently accused of severe human rights violations.
+
+## Base Template (use as reference, vary the wording each time):
+```
+Madam, Sir,
+
+I am writing to you as a concerned member of the academic and civic community, deeply attached to the core values that institutions such as Sciences Po represent: intellectual rigor, ethical responsibility, and respect for human rights.
+
+It has come to my attention that one of your faculty members (Kevan Gafaïti) has, in several public and official forums, taken positions that appear to minimize, justify, or reframe the actions of the Islamic Republic of Iran during the recent repression of nationwide protests in Iran (January 2026). These events have been widely documented by international organizations, independent media, and human rights NGOs as involving large-scale violence against civilians, including arbitrary arrests, torture, and the killing of protesters.
+
+What is particularly concerning is not the expression of a controversial opinion per se—which is, of course, protected within an academic context—but the use of academic authority and institutional credibility to promote narratives that align closely with state propaganda of a regime currently accused of severe human rights violations. Such discourse risks contributing to the normalization or whitewashing of violence against civilian populations.
+
+As an institution that plays a central role in shaping future policymakers, diplomats, and researchers, Sciences Po holds a special responsibility to ensure that public interventions by its faculty uphold standards of factual accuracy, ethical integrity, and respect for international human rights principles.
+
+I respectfully request that the institution review this matter and clarify its position regarding the use of academic platforms to disseminate narratives that may undermine these fundamental values.
+
+Thank you for your attention to this matter. I trust in Sciences Po's commitment to academic excellence and moral responsibility.
+
+Yours sincerely,
+```
+
+## Key Points to Include (vary the wording each time):
+- A faculty member (Kevan Gafaïti) has taken positions minimizing/justifying Iran regime actions
+- Recent protests in Iran (January 2026) involved large-scale violence, arrests, torture, killing
+- Use of academic authority to promote regime propaganda is concerning
+- This risks normalizing violence against civilians
+- Sciences Po has responsibility to uphold factual accuracy and ethical integrity
+- Request institutional review and position clarification
+
+## Tone:
+- Formal, respectful, professional
+- Academic language
+- Not attacking the person directly but raising institutional concern
+- Constructive, solution-oriented
+"""
+
+
+def get_sciencespo_email_prompt(language="en"):
+    """
+    Creates the prompt for generating a Sciences Po email.
+    Returns tuple of (subject_prompt, body_prompt)
+
+    Args:
+        language: "en" for English, "fr" for French
+    """
+    lang_name = "French" if language == "fr" else "English"
+
+    subject_prompt = f"""
+{SCIENCESPO_EMAIL_CONTEXT}
+
+## Your Task
+Generate ONE email subject line in {lang_name} for this concern.
+
+## Requirements:
+- Write in {lang_name}
+- Keep it formal and professional
+- About concern regarding a faculty member's public statements
+- Under 100 characters
+- Based on: "Concern Regarding Public Statements by a Faculty Member (Kevan Gafaïti)"
+
+## CRITICAL: Output EXACTLY ONE subject line.
+- Do NOT output multiple options
+- Do NOT number anything
+- Do NOT include explanations
+- Just write ONE single subject line
+
+Output ONE subject line now:"""
+
+    body_prompt = f"""
+{SCIENCESPO_EMAIL_CONTEXT}
+
+## Your Task
+Generate ONE SINGLE email body in {lang_name} expressing concern about the faculty member's public statements.
+
+## Requirements:
+- Write entirely in {lang_name}
+- Be formal, respectful, and professional
+- Include the key points but vary the wording from the template
+- Use academic/institutional tone
+- About 200-350 words
+- End with a respectful closing
+- Address to "Madam, Sir," or equivalent in {lang_name}
+
+## CRITICAL - OUTPUT EXACTLY ONE EMAIL:
+- Do NOT output multiple emails or variations
+- Do NOT number anything (no "Email 1:", "Email 2:", etc.)
+- Do NOT include explanations or options
+- Just write ONE SINGLE email body
+
+## CRITICAL - NO PLACEHOLDERS:
+- Do NOT use any placeholders like <Name>, <Signature>, <Your Name>, etc.
+- The email must be READY TO SEND as-is, no editing needed
+- Do NOT include a signature line - the sender will add their own
+
+Write ONLY ONE email body in {lang_name} (no quotes, no numbering, no explanations):"""
+
+    return subject_prompt, body_prompt
+
+
+# France Foreign Ministry Email Template
+FRANCE_EMAIL_CONTEXT = """
+## Context: Appeal to the French Government - IRGC Terrorist Designation
+
+An appeal to the Government of France and its Minister for Europe and Foreign Affairs to support the Iranian people and vote positively at the upcoming EU Foreign Ministers meeting to designate the Islamic Revolutionary Guard Corps (IRGC) as a terrorist organization.
+
+The letter also references France's historical role in enabling the rise of Ayatollah Khomeini's rule over Iran.
+
+## Base Template (use as reference, vary the wording each time):
+```
+We, the people of Iran, who for many years have been living under the harshest conditions imposed by a repressive, violent, and inhumane authoritarian regime, respectfully yet firmly address you at this critical and decisive moment.
+
+In light of the bitter historical experience of the Iranian nation regarding France's role in enabling the rise of Ayatollah Khomeini's reactionary rule and its domination over the destiny of the Iranian people, we urge the Government of France to stand on the right side of history. We call upon France to stand with the Iranian people and to take concrete and effective action toward addressing and compensating for the profound and lasting harm inflicted upon our nation.
+
+Today, the people of Iran are paying an immense price in their pursuit of universal and fundamental values: democracy, freedom, human rights, and the rule of law. Countless lives have been lost, and many more have been subjected to imprisonment, torture, and systematic repression.
+
+In this context, we respectfully urge the Government of France, and you personally as Minister for Europe and Foreign Affairs, to support—through a positive vote at the upcoming meeting of the Foreign Ministers of the European Union—the designation of the Islamic Revolutionary Guard Corps (IRGC) as a terrorist organization. The IRGC plays a central and well-documented role in domestic repression, widespread human rights violations, and destabilizing and terrorist activities both in the region and internationally.
+
+Standing with the people of Iran means standing for human dignity, justice, and a future founded on peace, democracy, and respect for international law. We believe that France, as a nation with a longstanding commitment to liberty and human rights, bears a moral and historical responsibility to act accordingly.
+
+We thank you for your attention to this urgent appeal and trust that France will choose to stand with the Iranian people in their legitimate struggle for freedom and democracy.
+
+Respectfully,
+```
+
+## Key Points to Include (vary the wording each time):
+- Address from the people of Iran living under a repressive regime
+- Reference France's historical role in enabling Khomeini's rise to power
+- Urge France to stand on the right side of history
+- People of Iran pursuing democracy, freedom, human rights
+- Request positive vote at EU Foreign Ministers meeting for IRGC terrorist designation
+- IRGC's role in repression, human rights violations, and terrorism
+- France's moral and historical responsibility
+- Appeal to liberty and human rights values
+
+## Tone:
+- Respectful yet firm
+- Dignified and passionate
+- Diplomatic but direct
+- References shared values of liberty and human rights
+"""
+
+
+def get_france_email_prompt(language="en"):
+    """
+    Creates the prompt for generating a France Foreign Ministry email.
+    Returns tuple of (subject_prompt, body_prompt)
+
+    Args:
+        language: "en" for English, "fr" for French
+    """
+    lang_name = "French" if language == "fr" else "English"
+
+    subject_prompt = f"""
+{FRANCE_EMAIL_CONTEXT}
+
+## Your Task
+Generate ONE email subject line in {lang_name} for this appeal.
+
+## Requirements:
+- Write in {lang_name}
+- Keep it formal and diplomatic
+- About supporting Iranian people and IRGC terrorist designation
+- Under 100 characters
+- Based on: "Appeal to Support the Iranian People and Designate the IRGC as a Terrorist Organization"
+
+## CRITICAL: Output EXACTLY ONE subject line.
+- Do NOT output multiple options
+- Do NOT number anything
+- Do NOT include explanations
+- Just write ONE single subject line
+
+Output ONE subject line now:"""
+
+    body_prompt = f"""
+{FRANCE_EMAIL_CONTEXT}
+
+## Your Task
+Generate ONE SINGLE email body in {lang_name} appealing to France to support Iranian people and designate IRGC.
+
+## Requirements:
+- Write entirely in {lang_name}
+- Be respectful yet firm and dignified
+- Include the key points but vary the wording from the template
+- Use diplomatic language
+- About 200-350 words
+- End with a respectful closing
+- Do NOT start with a salutation/greeting - start directly with the appeal
+
+## CRITICAL - OUTPUT EXACTLY ONE EMAIL:
+- Do NOT output multiple emails or variations
+- Do NOT number anything (no "Email 1:", "Email 2:", etc.)
+- Do NOT include explanations or options
+- Just write ONE SINGLE email body
+
+## CRITICAL - NO PLACEHOLDERS:
+- Do NOT use any placeholders like <Name>, <Signature>, <Your Name>, etc.
+- The email must be READY TO SEND as-is, no editing needed
+- Do NOT include a signature line - the sender will add their own
+
+Write ONLY ONE email body in {lang_name} (no quotes, no numbering, no explanations):"""
+
+    return subject_prompt, body_prompt
+
+
+# Spain Foreign Ministry Email Template
+SPAIN_EMAIL_CONTEXT = """
+## Context: Appeal to the Spanish Government - IRGC Terrorist Designation
+
+An appeal to the Government of Spain and its Minister of Foreign Affairs, European Union and Cooperation to support the Iranian people and vote positively at the upcoming EU Foreign Ministers meeting to designate the Islamic Revolutionary Guard Corps (IRGC) as a terrorist organization.
+
+## Base Template (use as reference, vary the wording each time):
+```
+We, the people of Iran, who for many years have been living under the harshest conditions imposed by a repressive, violent, and inhumane authoritarian regime, respectfully yet firmly address you at this critical and decisive moment.
+
+In light of the bitter historical experience of the Iranian nation with international actors whose actions or inaction have contributed to the consolidation of authoritarian rule over the destiny of the Iranian people, we urge the Government of Spain to stand on the right side of history. We call upon Spain to stand with the Iranian people and to take concrete and effective action toward addressing and helping remedy the profound and lasting harm inflicted upon our nation.
+
+Today, the people of Iran are paying an immense price in their pursuit of universal and fundamental values: democracy, freedom, human rights, and the rule of law. Countless lives have been lost, and many more have been subjected to imprisonment, torture, and systematic repression.
+
+In this context, we respectfully urge the Government of Spain, and you personally as Minister of Foreign Affairs, European Union and Cooperation, to support—through a positive vote at the upcoming meeting of the Foreign Ministers of the European Union—the designation of the Islamic Revolutionary Guard Corps (IRGC) as a terrorist organization. The IRGC plays a central and well-documented role in domestic repression, widespread human rights violations, and destabilizing and terrorist activities both in the region and internationally.
+
+Standing with the people of Iran means standing for human dignity, justice, and a future founded on peace, democracy, and respect for international law. We believe that Spain, as a nation committed to democratic values, human rights, and international cooperation, bears a moral responsibility to act accordingly.
+
+We thank you for your attention to this urgent appeal and trust that Spain will choose to stand with the Iranian people in their legitimate struggle for freedom and democracy.
+
+Respectfully,
+```
+
+## Key Points to Include (vary the wording each time):
+- Address from the people of Iran living under a repressive regime
+- Urge Spain to stand on the right side of history
+- People of Iran pursuing democracy, freedom, human rights
+- Request positive vote at EU Foreign Ministers meeting for IRGC terrorist designation
+- IRGC's role in repression, human rights violations, and terrorism
+- Spain's moral responsibility as a democratic nation
+- Appeal to shared democratic values and human rights
+
+## Tone:
+- Respectful yet firm
+- Dignified and passionate
+- Diplomatic but direct
+- References shared democratic values
+"""
+
+
+def get_spain_email_prompt(language="en"):
+    """
+    Creates the prompt for generating a Spain Foreign Ministry email.
+    Returns tuple of (subject_prompt, body_prompt)
+
+    Args:
+        language: "en" for English, "es" for Spanish
+    """
+    lang_name = "Spanish" if language == "es" else "English"
+
+    subject_prompt = f"""
+{SPAIN_EMAIL_CONTEXT}
+
+## Your Task
+Generate ONE email subject line in {lang_name} for this appeal.
+
+## Requirements:
+- Write in {lang_name}
+- Keep it formal and diplomatic
+- About supporting Iranian people and IRGC terrorist designation
+- Under 100 characters
+- Based on: "Appeal to Support the Iranian People and Designate the IRGC as a Terrorist Organization"
+
+## CRITICAL: Output EXACTLY ONE subject line.
+- Do NOT output multiple options
+- Do NOT number anything
+- Do NOT include explanations
+- Just write ONE single subject line
+
+Output ONE subject line now:"""
+
+    body_prompt = f"""
+{SPAIN_EMAIL_CONTEXT}
+
+## Your Task
+Generate ONE SINGLE email body in {lang_name} appealing to Spain to support Iranian people and designate IRGC.
+
+## Requirements:
+- Write entirely in {lang_name}
+- Be respectful yet firm and dignified
+- Include the key points but vary the wording from the template
+- Use diplomatic language
+- About 200-350 words
+- End with a respectful closing
+- Do NOT start with a salutation/greeting - start directly with the appeal
+
+## CRITICAL - OUTPUT EXACTLY ONE EMAIL:
+- Do NOT output multiple emails or variations
+- Do NOT number anything (no "Email 1:", "Email 2:", etc.)
+- Do NOT include explanations or options
+- Just write ONE SINGLE email body
+
+## CRITICAL - NO PLACEHOLDERS:
+- Do NOT use any placeholders like <Name>, <Signature>, <Your Name>, etc.
+- The email must be READY TO SEND as-is, no editing needed
+- Do NOT include a signature line - the sender will add their own
+
+Write ONLY ONE email body in {lang_name} (no quotes, no numbering, no explanations):"""
+
+    return subject_prompt, body_prompt
+
+
 # Smart Reply System Prompt - Harsh Roasting Style
 SMART_REPLY_SYSTEM_PROMPT = """تو یه ایرانی زبون‌دار و تیزی که توی توییتر روست میکنی. جواب‌هات باید سوزنده، خنده‌دار و کشنده باشه.
 

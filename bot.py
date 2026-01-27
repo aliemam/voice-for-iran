@@ -104,6 +104,15 @@ Kiitos ajastanne ja huomiostanne."""
 YLE_EMAIL_SUBJECT = "Huomio artikkelin harhaanjohtavaan sanamuotoon Iranin vallankäytöstä"
 YLE_EMAIL_TO = "oikaisu.verkko@yle.fi,yleinfo@yle.fi,uutiset@yle.fi"
 
+# Sciences Po (Kevan Gafaïti) Email
+SCIENCESPO_EMAIL_TO = "accueil.enseignant@sciencespo.fr,media@sciencespo.fr,webmestre@sciencespo.fr,info@sciencespo-alumni.fr,integrite.scientifique@sciencespo.fr,claudine.lamaze@sciencespo.fr,marina.abelskaiagraziani@sciencespo.fr,benedicte.barbe@sciencespo.fr,vincent.morandi@sciencespo.fr,elsa.bedos@sciencespo.fr,helene.naudet@sciencespo.fr"
+
+# France Foreign Ministry Email
+FRANCE_EMAIL_TO = "francois-xavier.bellamy@europarl.europa.eu,gregory.allione@europarl.europa.eu,mathilde.androuet@europarl.europa.eu,manon.aubry@europarl.europa.eu,jordan.bardella@europarl.europa.eu,nicolas.bay@europarl.europa.eu,christophe.bay@europarl.europa.eu,gilles.boyer@europarl.europa.eu,marie-luce.brasier-clain@europarl.europa.eu,melissa.camara@europarl.europa.eu,courrier.bruxelles-dfra@diplomatie.gouv.fr,presse.bruxelles-dfra@diplomatie.gouv.fr,mail.bruxelles-dfra@diplomatie.gouv.fr,rp.strasbourg-dfra@diplomatie.gouv.fr"
+
+# Spain Foreign Ministry Email
+SPAIN_EMAIL_TO = "esteban.gonzalezpons@europarl.europa.eu,maravillas.abadiajover@europarl.europa.eu,pablo.ariasecheverria@europarl.europa.eu,isabel.benjumea@europarl.europa.eu,pilar.delcastillo@europarl.europa.eu,mariacarmen.crespodiaz@europarl.europa.eu,raul.delahoz@europarl.europa.eu,rosa.estaras@europarl.europa.eu,alma.ezcurra@europarl.europa.eu,jonas.fernandez@europarl.europa.eu,lina.galvez@europarl.europa.eu,iratxe.garcia@europarl.europa.eu,sandra.gomezlopez@europarl.europa.eu,nicolas.gonzalezcasares@europarl.europa.eu,javi.lopez@europarl.europa.eu,juanfernando.lopezaguilar@europarl.europa.eu,cesar.luena@europarl.europa.eu,cristina.maestre@europarl.europa.eu,idoia.mendia@europarl.europa.eu,javier.morenosanchez@europarl.europa.eu,leire.pajin@europarl.europa.eu,marcos.rossempere@europarl.europa.eu,nacho.sanchezamor@europarl.europa.eu,elena.sancho@europarl.europa.eu,rosa.serrano@europarl.europa.eu,emb.bruselas@maec.es,Secretaria.Emb@reper.maec.es,alicia.cocero@reper.maec.es,sergi.farre@reper.maec.es,juan.hernandez@reper.maec.es,marta.bardon@reper.maec.es,secretaria.erpa@reper.maec.es,victoria.ortega@reper.maec.es,Cops.Espana@reper.maec.es,Laura.martinez@reper.maec.es,Asis.barrera@reper.maec.es,Nuno.santos@reper.maec.es,Antonio.leton@reper.maec.es,comunicacion-pres@reper.maec.es,javier.molina@reper.maec.es,carlos.gomez@reper.maec.es,Ae.Cjur@reper.maec.es,mariajose.ruizsanchez@reper.maec.es,luis.aguilera@reper.maec.es,yago.fernandez@reper.maec.es,Parlamentoue@reper.maec.es,rossana.rosello@reper.maec.es,Unidadpresencia@reper.maec.es,elena.campos@reper.maec.es,leticia.lorenzo@reper.maec.es,cesar.pla@reper.maec.es,Coecad@reper.maec.es,cecilia.rocha@reper.maec.es,rocio.perezds@reper.maec.es,informae@maec.es,consular@maec.es,informacion.consular@maec.es,dg.cdpr@maec.es,prensa@maec.es,sg.cedpr@maec.es,dg.diplomaciaeconomica@maec.es,protocolo@maec.es,se.aex@maec.es,polext@maec.es,dg.mamop@maec.es,dg.nnuuddhh@maec.es"
+
 
 def is_valid_handle_format(handle: str) -> bool:
     """Check if a Twitter handle has valid format."""
@@ -124,6 +133,9 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     )
 
     keyboard = [
+        [InlineKeyboardButton(UI["sciencespo_button"], callback_data="sciencespo_email")],
+        [InlineKeyboardButton(UI["france_button"], callback_data="france_email")],
+        [InlineKeyboardButton(UI["spain_button"], callback_data="spain_email")],
         [InlineKeyboardButton(UI["smart_reply_button"], callback_data="smart_reply")],
         [InlineKeyboardButton(UI["platforms"]["twitter"], callback_data="platform_twitter")],
         [InlineKeyboardButton(UI["platforms"]["instagram"], callback_data="platform_instagram")],
@@ -472,6 +484,9 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         context.user_data["selected_targets"] = []
 
         keyboard = [
+            [InlineKeyboardButton(UI["sciencespo_button"], callback_data="sciencespo_email")],
+            [InlineKeyboardButton(UI["france_button"], callback_data="france_email")],
+            [InlineKeyboardButton(UI["spain_button"], callback_data="spain_email")],
             [InlineKeyboardButton(UI["smart_reply_button"], callback_data="smart_reply")],
             [InlineKeyboardButton(UI["platforms"]["twitter"], callback_data="platform_twitter")],
             [InlineKeyboardButton(UI["platforms"]["instagram"], callback_data="platform_instagram")],
@@ -825,6 +840,202 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
                 f"{UI['denmark_title']}\n\n"
                 f"{UI['denmark_email_explain']}\n\n"
                 "✅ ایمیل آماده است! روی دکمه زیر کلیک کنید:",
+                reply_markup=InlineKeyboardMarkup(keyboard),
+            )
+
+
+    # Sciences Po Campaign - Show language selection
+    elif data == "sciencespo_email":
+        await query.answer()
+        log_action(telegram_id=user.id, username=user.username, action="sciencespo_start", target_handle="")
+
+        keyboard = [
+            [InlineKeyboardButton("🇬🇧 English", callback_data="sciencespo_lang_en")],
+            [InlineKeyboardButton("🇫🇷 Français", callback_data="sciencespo_lang_fr")],
+            [InlineKeyboardButton(UI["start_over"], callback_data="back_to_start")],
+        ]
+
+        await query.edit_message_text(
+            f"{UI['sciencespo_title']}\n\n"
+            f"{UI['sciencespo_situation']}\n\n"
+            f"{UI['sciencespo_select_language']}",
+            reply_markup=InlineKeyboardMarkup(keyboard),
+        )
+
+    # Sciences Po Campaign - Generate email in selected language
+    elif data.startswith("sciencespo_lang_"):
+        await query.answer()
+        language = data.replace("sciencespo_lang_", "")
+        log_action(telegram_id=user.id, username=user.username, action="sciencespo_email", target_handle=SCIENCESPO_EMAIL_TO, language=language)
+
+        await query.edit_message_text(
+            f"{UI['sciencespo_title']}\n\n"
+            f"{UI['sciencespo_generating']}"
+        )
+
+        try:
+            from ai_generator import generate_sciencespo_email
+            subject, body = generate_sciencespo_email(language)
+
+            email_page_base = "https://aliemam.github.io/voice-for-iran/"
+            bcc_encoded = urllib.parse.quote(SCIENCESPO_EMAIL_TO, safe='')
+            sub_encoded = urllib.parse.quote_plus(subject)
+            body_encoded = urllib.parse.quote_plus(body)
+            email_page_url = f"{email_page_base}?to=&bcc={bcc_encoded}&sub={sub_encoded}&body={body_encoded}"
+
+            lang_label = "🇫🇷 فرانسوی" if language == "fr" else "🇬🇧 انگلیسی"
+
+            keyboard = [
+                [InlineKeyboardButton("📧 ارسال ایمیل به Sciences Po", url=email_page_url)],
+                [InlineKeyboardButton(UI["start_over"], callback_data="back_to_start")],
+            ]
+
+            await query.edit_message_text(
+                f"{UI['sciencespo_title']}\n\n"
+                f"{UI['sciencespo_email_explain']}\n\n"
+                f"📝 زبان: {lang_label}\n\n"
+                "✅ ایمیل منحصربه‌فرد آماده است! روی دکمه زیر کلیک کنید:",
+                reply_markup=InlineKeyboardMarkup(keyboard),
+            )
+        except Exception as e:
+            logger.error(f"Error generating Sciences Po email: {e}")
+            keyboard = [
+                [InlineKeyboardButton("🔄 تلاش مجدد", callback_data="sciencespo_email")],
+                [InlineKeyboardButton(UI["start_over"], callback_data="back_to_start")],
+            ]
+            await query.edit_message_text(
+                f"{UI['sciencespo_title']}\n\n"
+                f"❌ خطا در ساختن ایمیل. لطفاً دوباره تلاش کنید.",
+                reply_markup=InlineKeyboardMarkup(keyboard),
+            )
+
+    # France Foreign Ministry Email Campaign - Show language selection
+    elif data == "france_email":
+        await query.answer()
+        log_action(telegram_id=user.id, username=user.username, action="france_email_start", target_handle="")
+
+        keyboard = [
+            [InlineKeyboardButton("🇬🇧 English", callback_data="france_lang_en")],
+            [InlineKeyboardButton("🇫🇷 Français", callback_data="france_lang_fr")],
+            [InlineKeyboardButton(UI["start_over"], callback_data="back_to_start")],
+        ]
+
+        await query.edit_message_text(
+            f"{UI['france_title']}\n\n"
+            f"{UI['france_situation']}\n\n"
+            "زبان ایمیل را انتخاب کنید:",
+            reply_markup=InlineKeyboardMarkup(keyboard),
+        )
+
+    # France Foreign Ministry - Generate email in selected language
+    elif data.startswith("france_lang_"):
+        await query.answer()
+        language = data.replace("france_lang_", "")
+        log_action(telegram_id=user.id, username=user.username, action="france_email", target_handle=FRANCE_EMAIL_TO, language=language)
+
+        await query.edit_message_text(
+            f"{UI['france_title']}\n\n"
+            f"{UI['france_generating']}"
+        )
+
+        try:
+            from ai_generator import generate_france_email
+            subject, body = generate_france_email(language)
+
+            email_page_base = "https://aliemam.github.io/voice-for-iran/"
+            bcc_encoded = urllib.parse.quote(FRANCE_EMAIL_TO, safe='')
+            sub_encoded = urllib.parse.quote_plus(subject)
+            body_encoded = urllib.parse.quote_plus(body)
+            email_page_url = f"{email_page_base}?to=&bcc={bcc_encoded}&sub={sub_encoded}&body={body_encoded}"
+
+            lang_label = "🇫🇷 فرانسوی" if language == "fr" else "🇬🇧 انگلیسی"
+
+            keyboard = [
+                [InlineKeyboardButton("📧 ارسال ایمیل به وزارت خارجه فرانسه", url=email_page_url)],
+                [InlineKeyboardButton(UI["start_over"], callback_data="back_to_start")],
+            ]
+
+            await query.edit_message_text(
+                f"{UI['france_title']}\n\n"
+                f"{UI['france_email_explain']}\n\n"
+                f"📝 زبان: {lang_label}\n\n"
+                "✅ ایمیل منحصربه‌فرد آماده است! روی دکمه زیر کلیک کنید:",
+                reply_markup=InlineKeyboardMarkup(keyboard),
+            )
+        except Exception as e:
+            logger.error(f"Error generating France email: {e}")
+            keyboard = [
+                [InlineKeyboardButton("🔄 تلاش مجدد", callback_data="france_email")],
+                [InlineKeyboardButton(UI["start_over"], callback_data="back_to_start")],
+            ]
+            await query.edit_message_text(
+                f"{UI['france_title']}\n\n"
+                f"❌ خطا در ساختن ایمیل. لطفاً دوباره تلاش کنید.",
+                reply_markup=InlineKeyboardMarkup(keyboard),
+            )
+
+    # Spain Foreign Ministry Email Campaign - Show language selection
+    elif data == "spain_email":
+        await query.answer()
+        log_action(telegram_id=user.id, username=user.username, action="spain_email_start", target_handle="")
+
+        keyboard = [
+            [InlineKeyboardButton("🇬🇧 English", callback_data="spain_lang_en")],
+            [InlineKeyboardButton("🇪🇸 Español", callback_data="spain_lang_es")],
+            [InlineKeyboardButton(UI["start_over"], callback_data="back_to_start")],
+        ]
+
+        await query.edit_message_text(
+            f"{UI['spain_title']}\n\n"
+            f"{UI['spain_situation']}\n\n"
+            "زبان ایمیل را انتخاب کنید:",
+            reply_markup=InlineKeyboardMarkup(keyboard),
+        )
+
+    # Spain Foreign Ministry - Generate email in selected language
+    elif data.startswith("spain_lang_"):
+        await query.answer()
+        language = data.replace("spain_lang_", "")
+        log_action(telegram_id=user.id, username=user.username, action="spain_email", target_handle=SPAIN_EMAIL_TO, language=language)
+
+        await query.edit_message_text(
+            f"{UI['spain_title']}\n\n"
+            f"{UI['spain_generating']}"
+        )
+
+        try:
+            from ai_generator import generate_spain_email
+            subject, body = generate_spain_email(language)
+
+            email_page_base = "https://aliemam.github.io/voice-for-iran/"
+            bcc_encoded = urllib.parse.quote(SPAIN_EMAIL_TO, safe='')
+            sub_encoded = urllib.parse.quote_plus(subject)
+            body_encoded = urllib.parse.quote_plus(body)
+            email_page_url = f"{email_page_base}?to=&bcc={bcc_encoded}&sub={sub_encoded}&body={body_encoded}"
+
+            lang_label = "🇪🇸 اسپانیایی" if language == "es" else "🇬🇧 انگلیسی"
+
+            keyboard = [
+                [InlineKeyboardButton("📧 ارسال ایمیل به وزارت خارجه اسپانیا", url=email_page_url)],
+                [InlineKeyboardButton(UI["start_over"], callback_data="back_to_start")],
+            ]
+
+            await query.edit_message_text(
+                f"{UI['spain_title']}\n\n"
+                f"{UI['spain_email_explain']}\n\n"
+                f"📝 زبان: {lang_label}\n\n"
+                "✅ ایمیل منحصربه‌فرد آماده است! روی دکمه زیر کلیک کنید:",
+                reply_markup=InlineKeyboardMarkup(keyboard),
+            )
+        except Exception as e:
+            logger.error(f"Error generating Spain email: {e}")
+            keyboard = [
+                [InlineKeyboardButton("🔄 تلاش مجدد", callback_data="spain_email")],
+                [InlineKeyboardButton(UI["start_over"], callback_data="back_to_start")],
+            ]
+            await query.edit_message_text(
+                f"{UI['spain_title']}\n\n"
+                f"❌ خطا در ساختن ایمیل. لطفاً دوباره تلاش کنید.",
                 reply_markup=InlineKeyboardMarkup(keyboard),
             )
 
