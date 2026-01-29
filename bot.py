@@ -869,7 +869,7 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
             email_page_url = f"{email_page_base}?to=&bcc={bcc_encoded}&sub={sub_encoded}&body={body_encoded}"
 
             keyboard = [
-                [InlineKeyboardButton("📧 ارسال ایمیل به وزارت خارجه فنلاند", url=email_page_url)],
+                [InlineKeyboardButton("📧 ارسال ایمیل به وزارت خارجه و پارلمان فنلاند", url=email_page_url)],
                 [InlineKeyboardButton(UI["start_over"], callback_data="back_to_start")],
             ]
 
