@@ -601,6 +601,110 @@ Generate ONE unique tweet in **{lang_name}** addressed to @{target.get('handle',
 Generate ONE tweet (UNDER 280 chars, START with @{target.get('handle', '')}):"""
 
 
+# Finland Embassy Closure Email Template
+FINLAND_EMBASSY_EMAIL_CONTEXT = """
+## Context: Request to Close Iranian Embassy in Finland
+
+An urgent appeal to the Finnish Ministry of Foreign Affairs requesting the closure of the Embassy of the Islamic Republic of Iran in Finland and the expulsion of Iranian diplomats.
+
+The Iranian regime has killed nearly 40,000 peaceful protesters during recent nationwide demonstrations. The embassy in Finland has been complicit in covering up, downplaying, and denying these crimes against humanity.
+
+## Base Template (use as reference, vary the wording each time - WRITE IN FINNISH):
+```
+Arvoisat vastaanottajat,
+
+Kirjoitamme teille syvän huolen ja vakavan moraalisen vastuuntunnon vallassa Iranin islamilaisen tasavallan jatkuvien ja järjestelmällisten väkivallantekojen johdosta omaa kansaansa vastaan.
+
+Lukuisten riippumattomien lähteiden sekä kansainvälisten ihmisoikeusjärjestöjen raporttien mukaan Iranin hallinto on surmannut viimeaikaisten valtakunnallisten mielenosoitusten yhteydessä lähes neljäkymmentätuhatta rauhanomaista mielenosoittajaa. Nämä teot muodostavat vakavia ihmisoikeusloukkauksia ja täyttävät rikokset ihmisyyttä vastaan -rikosten tunnusmerkistön. Lisäksi kymmeniä tuhansia ihmisiä on haavoitettu, pidätetty mielivaltaisesti tai kadotettu pakkokeinoin, minkä seurauksena lähes jokainen iranilainen perhe on joutunut kärsimään näistä rikoksista.
+
+Tässä tilanteessa Iranin islamilaisen tasavallan suurlähetystö Suomessa on toiminut tavalla, joka on ristiriidassa diplomaattisten velvoitteiden ja kansainvälisten normien kanssa, osallistumalla näiden rikosten peittelyyn, vähättelyyn ja kieltämiseen sen sijaan, että se noudattaisi avoimuuden ja vastuullisuuden periaatteita.
+
+Näihin vakaviin seikkoihin vedoten pyydämme kunnioittavasti Suomen ulkoministeriötä ryhtymään välittömiin ja päättäväisiin toimenpiteisiin, mukaan lukien:
+Iranin islamilaisen tasavallan suurlähetystön sulkeminen Suomessa,
+
+Iranin suurlähettilään sekä koko lähetystöhenkilökunnan karkottaminen Suomen alueelta.
+Uskomme vakaasti, että tällaiset toimet olisivat selkeä ja periaatteellinen kannanotto ihmisoikeuksien, kansainvälisen oikeuden sekä vapauden, ihmisarvon ja oikeudenmukaisuuden puolesta.
+
+Pyydämme Suomen ulkoministeriötä asettumaan historian oikealle puolelle ja tukemaan Iranin kansaa sen rohkeassa taistelussa vapauden, demokratian ja perusihmisoikeuksien saavuttamiseksi.
+
+Kiitämme teitä ajastanne, huomiostanne ja sitoutumisestanne ihmisoikeuksien ja inhimillisten arvojen puolustamiseen.
+Kunnioittavasti
+```
+
+## Key Points to Include (vary the wording each time - WRITE IN FINNISH):
+- Nearly 40,000 peaceful protesters killed by Iranian regime
+- Tens of thousands wounded, arbitrarily detained, or forcibly disappeared
+- Embassy has been complicit in covering up and denying these crimes
+- Request immediate closure of the Iranian embassy in Finland
+- Request expulsion of the Iranian ambassador and all embassy staff
+- Finland should stand on the right side of history
+- Support Iranian people in their fight for freedom and democracy
+
+## Tone:
+- Formal, respectful, urgent
+- Diplomatic but firm
+- Moral appeal to human rights values
+- Written entirely in Finnish
+"""
+
+
+def get_finland_embassy_email_prompt():
+    """
+    Creates the prompt for generating a Finland embassy closure email.
+    Returns tuple of (subject_prompt, body_prompt)
+    """
+    subject_prompt = f"""
+{FINLAND_EMBASSY_EMAIL_CONTEXT}
+
+## Your Task
+Generate ONE email subject line in Finnish for this urgent appeal.
+
+## Requirements:
+- Write in Finnish
+- Keep it formal and urgent
+- About requesting closure of Iranian embassy and expulsion of diplomats
+- Under 100 characters
+- Based on: "Kiireellinen vetoomus Iranin tilanteesta ja Iranin islamilaisen tasavallan suurlähetystön toiminnasta Suomessa"
+
+## CRITICAL: Output EXACTLY ONE subject line.
+- Do NOT output multiple options
+- Do NOT number anything
+- Do NOT include explanations
+- Just write ONE single subject line in Finnish
+
+Output ONE subject line now:"""
+
+    body_prompt = f"""
+{FINLAND_EMBASSY_EMAIL_CONTEXT}
+
+## Your Task
+Generate ONE SINGLE email body in Finnish requesting the closure of the Iranian embassy in Finland.
+
+## Requirements:
+- Write entirely in Finnish
+- Be formal, respectful, but urgent and firm
+- Include the key points but vary the wording from the template
+- Use diplomatic language
+- About 250-400 words
+- End with a respectful closing
+- Address to "Arvoisat vastaanottajat," or similar in Finnish
+
+## CRITICAL - OUTPUT EXACTLY ONE EMAIL:
+- Do NOT output multiple emails or variations
+- Do NOT number anything (no "Email 1:", "Email 2:", etc.)
+- Do NOT include explanations or options
+- Just write ONE SINGLE email body
+
+## CRITICAL - NO PLACEHOLDERS:
+- Do NOT use any placeholders like <Name>, <Signature>, <Nimi>, etc.
+- The email must be READY TO SEND as-is, no editing needed
+- Do NOT include a signature line - the sender will add their own
+
+Write ONLY ONE email body in Finnish (no quotes, no numbering, no explanations):"""
+
+    return subject_prompt, body_prompt
+
+
 # Sciences Po (Kevan Gafaïti) Email Template
 SCIENCESPO_EMAIL_CONTEXT = """
 ## Context: Sciences Po Faculty Member - Kevan Gafaïti

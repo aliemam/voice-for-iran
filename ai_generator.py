@@ -6,7 +6,7 @@ Generates unique, personalized messages for social media.
 import re
 import anthropic
 from config import ANTHROPIC_API_KEY, CLAUDE_MODEL, CLAUDE_MODEL_SMART
-from templates import get_system_prompt, get_generation_prompt, get_trump_senator_prompt, get_finland_email_prompt, get_denmark_email_prompt, get_yle_email_prompt, get_yle_tweet_prompt, SMART_REPLY_SYSTEM_PROMPT, get_smart_reply_prompt, get_sciencespo_email_prompt, get_france_email_prompt, get_spain_email_prompt
+from templates import get_system_prompt, get_generation_prompt, get_trump_senator_prompt, get_finland_email_prompt, get_denmark_email_prompt, get_yle_email_prompt, get_yle_tweet_prompt, SMART_REPLY_SYSTEM_PROMPT, get_smart_reply_prompt, get_sciencespo_email_prompt, get_france_email_prompt, get_spain_email_prompt, get_finland_embassy_email_prompt
 
 
 class MessageGenerator:
@@ -365,6 +365,66 @@ Write only in {lang_name}. Be respectful but clear."""
         raise Exception(f"API Error: {str(e)}")
     except Exception as e:
         raise Exception(f"Error generating Yle tweet: {str(e)}")
+
+
+def generate_finland_embassy_email() -> tuple:
+    """
+    Generates a unique Finland embassy closure email (subject and body) in Finnish.
+
+    Returns:
+        Tuple of (subject, body) - both in Finnish
+    """
+    generator = get_generator()
+    subject_prompt, body_prompt = get_finland_embassy_email_prompt()
+
+    system_prompt = """You are helping generate formal diplomatic correspondence in Finnish.
+Your role is to create unique, urgent, firm emails requesting diplomatic action.
+Each email must be unique - vary the wording while keeping the same message.
+Write only in Finnish. Be formal, respectful, but urgent and firm."""
+
+    try:
+        # Generate subject
+        subject_response = generator.client.messages.create(
+            model=generator.model,
+            max_tokens=100,
+            system=system_prompt,
+            messages=[{"role": "user", "content": subject_prompt}],
+        )
+        subject = subject_response.content[0].text.strip()
+
+        # Clean up subject
+        if subject.startswith('"') and subject.endswith('"'):
+            subject = subject[1:-1]
+        if '\n' in subject:
+            subject = subject.split('\n')[0]
+        subject = re.sub(r'^\d+[\.\)]\s*', '', subject)
+
+        # Generate body
+        body_response = generator.client.messages.create(
+            model=generator.model,
+            max_tokens=1500,
+            system=system_prompt,
+            messages=[{"role": "user", "content": body_prompt}],
+        )
+        body = body_response.content[0].text.strip()
+
+        # Clean up body
+        if body.startswith('"') and body.endswith('"'):
+            body = body[1:-1]
+
+        for pattern in ['Email 2:', 'Email 3:', 'E-mail 2:', '\n---\n', '\n\n---']:
+            if pattern in body:
+                body = body.split(pattern)[0].strip()
+
+        body = re.sub(r'^Email\s*\d+:\s*\n?', '', body, flags=re.IGNORECASE)
+        body = re.sub(r'^E-mail\s*\d+:\s*\n?', '', body, flags=re.IGNORECASE)
+
+        return subject, body
+
+    except anthropic.APIError as e:
+        raise Exception(f"API Error: {str(e)}")
+    except Exception as e:
+        raise Exception(f"Error generating Finland embassy email: {str(e)}")
 
 
 def generate_sciencespo_email(language="en") -> tuple:

@@ -104,6 +104,9 @@ Kiitos ajastanne ja huomiostanne."""
 YLE_EMAIL_SUBJECT = "Huomio artikkelin harhaanjohtavaan sanamuotoon Iranin vallankäytöstä"
 YLE_EMAIL_TO = "oikaisu.verkko@yle.fi,yleinfo@yle.fi,uutiset@yle.fi"
 
+# Finland Embassy Closure Email
+FINLAND_EMBASSY_EMAIL_TO = "ALA-02@gov.fi,ALA-03@gov.fi,int.dep@eduskunta.fi,anna.sorto@eduskunta.fi,kaisa.mannisto@eduskunta.fi,ALA-10@gov.fi,ALA-01@gov.fi"
+
 # Sciences Po (Kevan Gafaïti) Email
 SCIENCESPO_EMAIL_TO = "accueil.enseignant@sciencespo.fr,media@sciencespo.fr,webmestre@sciencespo.fr,info@sciencespo-alumni.fr,integrite.scientifique@sciencespo.fr,claudine.lamaze@sciencespo.fr,marina.abelskaiagraziani@sciencespo.fr,benedicte.barbe@sciencespo.fr,vincent.morandi@sciencespo.fr,elsa.bedos@sciencespo.fr,helene.naudet@sciencespo.fr"
 
@@ -133,6 +136,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     )
 
     keyboard = [
+        [InlineKeyboardButton(UI["finland_embassy_button"], callback_data="finland_embassy_email")],
         [InlineKeyboardButton(UI["sciencespo_button"], callback_data="sciencespo_email")],
         [InlineKeyboardButton(UI["smart_reply_button"], callback_data="smart_reply")],
         [InlineKeyboardButton(UI["platforms"]["twitter"], callback_data="platform_twitter")],
@@ -482,6 +486,7 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         context.user_data["selected_targets"] = []
 
         keyboard = [
+            [InlineKeyboardButton(UI["finland_embassy_button"], callback_data="finland_embassy_email")],
             [InlineKeyboardButton(UI["sciencespo_button"], callback_data="sciencespo_email")],
             [InlineKeyboardButton(UI["smart_reply_button"], callback_data="smart_reply")],
             [InlineKeyboardButton(UI["platforms"]["twitter"], callback_data="platform_twitter")],
@@ -839,6 +844,52 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
                 reply_markup=InlineKeyboardMarkup(keyboard),
             )
 
+
+    # Finland Embassy Closure Email Campaign
+    elif data == "finland_embassy_email":
+        await query.answer()
+        log_action(telegram_id=user.id, username=user.username, action="finland_embassy_start", target_handle="")
+
+        await query.edit_message_text(
+            f"{UI['finland_embassy_title']}\n\n"
+            f"{UI['finland_embassy_situation']}\n\n"
+            f"{UI['finland_embassy_generating']}"
+        )
+
+        try:
+            from ai_generator import generate_finland_embassy_email
+            subject, body = generate_finland_embassy_email()
+
+            log_action(telegram_id=user.id, username=user.username, action="finland_embassy_email", target_handle=FINLAND_EMBASSY_EMAIL_TO, language="fi")
+
+            email_page_base = "https://aliemam.github.io/voice-for-iran/"
+            bcc_encoded = urllib.parse.quote(FINLAND_EMBASSY_EMAIL_TO, safe='')
+            sub_encoded = urllib.parse.quote_plus(subject)
+            body_encoded = urllib.parse.quote_plus(body)
+            email_page_url = f"{email_page_base}?to=&bcc={bcc_encoded}&sub={sub_encoded}&body={body_encoded}"
+
+            keyboard = [
+                [InlineKeyboardButton("📧 ارسال ایمیل به وزارت خارجه فنلاند", url=email_page_url)],
+                [InlineKeyboardButton(UI["start_over"], callback_data="back_to_start")],
+            ]
+
+            await query.edit_message_text(
+                f"{UI['finland_embassy_title']}\n\n"
+                f"{UI['finland_embassy_email_explain']}\n\n"
+                "✅ ایمیل منحصربه‌فرد آماده است! روی دکمه زیر کلیک کنید:",
+                reply_markup=InlineKeyboardMarkup(keyboard),
+            )
+        except Exception as e:
+            logger.error(f"Error generating Finland embassy email: {e}")
+            keyboard = [
+                [InlineKeyboardButton("🔄 تلاش مجدد", callback_data="finland_embassy_email")],
+                [InlineKeyboardButton(UI["start_over"], callback_data="back_to_start")],
+            ]
+            await query.edit_message_text(
+                f"{UI['finland_embassy_title']}\n\n"
+                f"❌ خطا در ساختن ایمیل. لطفاً دوباره تلاش کنید.",
+                reply_markup=InlineKeyboardMarkup(keyboard),
+            )
 
     # Sciences Po Campaign - Show language selection
     elif data == "sciencespo_email":
