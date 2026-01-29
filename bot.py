@@ -134,8 +134,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
     keyboard = [
         [InlineKeyboardButton(UI["sciencespo_button"], callback_data="sciencespo_email")],
-        [InlineKeyboardButton(UI["france_button"], callback_data="france_email")],
-        [InlineKeyboardButton(UI["spain_button"], callback_data="spain_email")],
         [InlineKeyboardButton(UI["smart_reply_button"], callback_data="smart_reply")],
         [InlineKeyboardButton(UI["platforms"]["twitter"], callback_data="platform_twitter")],
         [InlineKeyboardButton(UI["platforms"]["instagram"], callback_data="platform_instagram")],
@@ -485,8 +483,6 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
 
         keyboard = [
             [InlineKeyboardButton(UI["sciencespo_button"], callback_data="sciencespo_email")],
-            [InlineKeyboardButton(UI["france_button"], callback_data="france_email")],
-            [InlineKeyboardButton(UI["spain_button"], callback_data="spain_email")],
             [InlineKeyboardButton(UI["smart_reply_button"], callback_data="smart_reply")],
             [InlineKeyboardButton(UI["platforms"]["twitter"], callback_data="platform_twitter")],
             [InlineKeyboardButton(UI["platforms"]["instagram"], callback_data="platform_instagram")],
