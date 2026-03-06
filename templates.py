@@ -1019,6 +1019,97 @@ Write ONLY ONE email body in {lang_name} (no quotes, no numbering, no explanatio
     return subject_prompt, body_prompt
 
 
+# Military Support Email Template
+MILITARY_SUPPORT_EMAIL_CONTEXT = """
+## Context: Appeal for Military Support for the People of Iran
+
+An appeal to the international community, specifically European governments and parliaments, requesting effective and decisive support for the liberation of the Iranian people from the current rule of religious despotism, including military operations.
+
+## Base Template (use as reference, vary the wording each time - WRITE IN ENGLISH):
+```
+The people of Iran today, with a clear voice and steadfast will, consciously and on the basis of their national interests, call upon the international community to provide effective and decisive support for liberation from the current rule of religious despotism. Such support, in its effective form, also includes military operations. This demand is raised not out of a desire for war, but out of vital and humanitarian necessity, because many Iranians view this confrontation as a great struggle on the path toward achieving a greater and more enduring peace—one that could lead to lasting peace and the removal of major threats endangering the civilizational future of the West.
+
+At the same time, we will not allow certain left-leaning ideological currents, or those who speak under the guise of "anti-war" slogans, once again—as in the past—to aid in the survival of a dictatorship through the distortion of facts and the deception of public opinion. Historical experience has shown Iranians that such positions, rather than defending peace, have led to the continuation of repression and violence.
+
+The vast number of reports, images, and pieces of evidence that are continuously emerging from within Iran, as well as from Iranians across the world, clearly bear witness to the fact that a powerful will has taken shape among the people of Iran to bring this situation to an end and to attain freedom, human dignity, and a future founded on peace and stability. This national demand for military support can neither be ignored nor diminished or distorted through ideological interpretations.
+```
+
+## Key Points to Include (vary the wording each time):
+- People of Iran consciously call upon the international community for effective support
+- This includes military operations as part of effective support
+- This demand is out of vital and humanitarian necessity, not desire for war
+- Iranians view this as a struggle toward achieving greater and more enduring peace
+- Removal of major threats endangering the civilizational future of the West
+- Reject "anti-war" rhetoric that aids survival of dictatorship
+- Historical experience shows such positions led to continuation of repression
+- Massive evidence of powerful will among Iranian people for freedom
+- National demand for military support cannot be ignored or distorted
+
+## Tone:
+- Dignified and resolute
+- Firm but not aggressive
+- Appeals to shared values of freedom, human dignity, peace
+- Written entirely in English
+"""
+
+
+def get_military_support_email_prompt():
+    """
+    Creates the prompt for generating a military support email.
+    Returns tuple of (subject_prompt, body_prompt)
+    """
+    subject_prompt = f"""
+{MILITARY_SUPPORT_EMAIL_CONTEXT}
+
+## Your Task
+Generate ONE email subject line in English for this appeal.
+
+## Requirements:
+- Write in English
+- Keep it formal and dignified
+- About support for the people of Iran
+- Under 100 characters
+- Based on: "Support of the People of Iran"
+
+## CRITICAL: Output EXACTLY ONE subject line.
+- Do NOT output multiple options
+- Do NOT number anything
+- Do NOT include explanations
+- Just write ONE single subject line
+
+Output ONE subject line now:"""
+
+    body_prompt = f"""
+{MILITARY_SUPPORT_EMAIL_CONTEXT}
+
+## Your Task
+Generate ONE SINGLE email body in English appealing for effective support for the people of Iran.
+
+## Requirements:
+- Write entirely in English
+- Be dignified, resolute, and firm
+- Include the key points but vary the wording from the template
+- Use formal, diplomatic language
+- About 200-350 words
+- End with a respectful closing
+- Do NOT start with a salutation/greeting - start directly with the appeal
+
+## CRITICAL - OUTPUT EXACTLY ONE EMAIL:
+- Do NOT output multiple emails or variations
+- Do NOT number anything (no "Email 1:", "Email 2:", etc.)
+- Do NOT include explanations or options
+- Just write ONE SINGLE email body
+
+## CRITICAL - NO PLACEHOLDERS:
+- Do NOT use any placeholders like <Name>, <Signature>, <Your Name>, etc.
+- The email must be READY TO SEND as-is, no editing needed
+- Do NOT include a signature line - the sender will add their own
+
+Write ONLY ONE email body in English (no quotes, no numbering, no explanations):"""
+
+    return subject_prompt, body_prompt
+
+
 # Smart Reply System Prompt - Harsh Roasting Style
 SMART_REPLY_SYSTEM_PROMPT = """تو یه ایرانی زبون‌دار و تیزی که توی توییتر روست میکنی. جواب‌هات باید سوزنده، خنده‌دار و کشنده باشه.
 

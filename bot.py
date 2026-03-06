@@ -136,6 +136,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     )
 
     keyboard = [
+        [InlineKeyboardButton(UI["military_support_button"], callback_data="military_support_email")],
         [InlineKeyboardButton(UI["finland_embassy_button"], callback_data="finland_embassy_email")],
         [InlineKeyboardButton(UI["sciencespo_button"], callback_data="sciencespo_email")],
         [InlineKeyboardButton(UI["smart_reply_button"], callback_data="smart_reply")],
@@ -486,6 +487,7 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         context.user_data["selected_targets"] = []
 
         keyboard = [
+            [InlineKeyboardButton(UI["military_support_button"], callback_data="military_support_email")],
             [InlineKeyboardButton(UI["finland_embassy_button"], callback_data="finland_embassy_email")],
             [InlineKeyboardButton(UI["sciencespo_button"], callback_data="sciencespo_email")],
             [InlineKeyboardButton(UI["smart_reply_button"], callback_data="smart_reply")],
@@ -844,6 +846,52 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
                 reply_markup=InlineKeyboardMarkup(keyboard),
             )
 
+
+    # Military Support Email Campaign
+    elif data == "military_support_email":
+        await query.answer()
+        log_action(telegram_id=user.id, username=user.username, action="military_support_start", target_handle="")
+
+        await query.edit_message_text(
+            f"{UI['military_support_title']}\n\n"
+            f"{UI['military_support_situation']}\n\n"
+            f"{UI['military_support_generating']}"
+        )
+
+        try:
+            from ai_generator import generate_military_support_email
+            subject, body = generate_military_support_email()
+
+            log_action(telegram_id=user.id, username=user.username, action="military_support_email", target_handle=FINLAND_EMBASSY_EMAIL_TO, language="en")
+
+            email_page_base = "https://aliemam.github.io/voice-for-iran/"
+            bcc_encoded = urllib.parse.quote(FINLAND_EMBASSY_EMAIL_TO, safe='')
+            sub_encoded = urllib.parse.quote_plus(subject)
+            body_encoded = urllib.parse.quote_plus(body)
+            email_page_url = f"{email_page_base}?to=&bcc={bcc_encoded}&sub={sub_encoded}&body={body_encoded}"
+
+            keyboard = [
+                [InlineKeyboardButton("📧 ارسال ایمیل به وزارت خارجه و پارلمان فنلاند", url=email_page_url)],
+                [InlineKeyboardButton(UI["start_over"], callback_data="back_to_start")],
+            ]
+
+            await query.edit_message_text(
+                f"{UI['military_support_title']}\n\n"
+                f"{UI['military_support_email_explain']}\n\n"
+                "✅ ایمیل منحصربه‌فرد آماده است! روی دکمه زیر کلیک کنید:",
+                reply_markup=InlineKeyboardMarkup(keyboard),
+            )
+        except Exception as e:
+            logger.error(f"Error generating military support email: {e}")
+            keyboard = [
+                [InlineKeyboardButton("🔄 تلاش مجدد", callback_data="military_support_email")],
+                [InlineKeyboardButton(UI["start_over"], callback_data="back_to_start")],
+            ]
+            await query.edit_message_text(
+                f"{UI['military_support_title']}\n\n"
+                f"❌ خطا در ساختن ایمیل. لطفاً دوباره تلاش کنید.",
+                reply_markup=InlineKeyboardMarkup(keyboard),
+            )
 
     # Finland Embassy Closure Email Campaign
     elif data == "finland_embassy_email":
