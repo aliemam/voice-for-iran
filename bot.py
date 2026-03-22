@@ -139,7 +139,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     )
 
     keyboard = [
-        [InlineKeyboardButton(UI["military_support_button"], callback_data="military_support_email")],
         [InlineKeyboardButton(UI["finland_embassy_button"], callback_data="finland_embassy_email")],
         [InlineKeyboardButton(UI["whitehouse_button"], callback_data="whitehouse_email")],
         [InlineKeyboardButton(UI["smart_reply_button"], callback_data="smart_reply")],
@@ -490,7 +489,6 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         context.user_data["selected_targets"] = []
 
         keyboard = [
-            [InlineKeyboardButton(UI["military_support_button"], callback_data="military_support_email")],
             [InlineKeyboardButton(UI["finland_embassy_button"], callback_data="finland_embassy_email")],
             [InlineKeyboardButton(UI["whitehouse_button"], callback_data="whitehouse_email")],
             [InlineKeyboardButton(UI["smart_reply_button"], callback_data="smart_reply")],
