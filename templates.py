@@ -1110,6 +1110,105 @@ Write ONLY ONE email body in English (no quotes, no numbering, no explanations):
     return subject_prompt, body_prompt
 
 
+# White House Energy Infrastructure Email Template
+WHITEHOUSE_EMAIL_CONTEXT = """
+## Context: Appeal to the US President Regarding Iran's Energy Infrastructure
+
+An appeal to the President of the United States expressing appreciation for US support of the Iranian people's struggle for liberation, while urging that any military actions avoid the complete destruction of Iran's vital energy infrastructure.
+
+## Base Template (use as reference, vary the wording each time - WRITE IN ENGLISH):
+```
+To the Honorable President of United States,
+
+We hereby express the sincere appreciation of Iran's freedom-seeking community for the President, the Government, and the Armed Forces of the United States for their effective assistance in supporting the Iranian people in their struggle for liberation from the oppressive and terrorist regime of the Islamic Republic.
+
+At the same time, we wish to convey our deep concern regarding any actions that may lead to the complete destruction of Iran's vital energy infrastructure. Undoubtedly, these infrastructures represent not only national assets but also constitute the foundation of livelihood and well-being for millions of Iranian citizens.
+
+Accordingly, we respectfully request that, in the event of any decisions or actions in this domain, an approach be adopted that prioritizes minimizing long-term harm to the civilian population. In circumstances where intervention or strikes against such facilities are deemed necessary, we kindly urge that, rather than pursuing their total destruction, only measures be employed that result in temporary and reversible disruption. Such an approach would ensure that, once stable conditions are established, reconstruction and restoration of operations can be achieved at the lowest possible cost and within the shortest feasible timeframe.
+
+The complete destruction of these infrastructures could result in extensive and long-lasting economic, social, and humanitarian consequences, which would primarily affect the resilient yet suffering people of Iran and significantly hinder the country's path toward recovery and stability.
+
+It is our hope that, in the formulation of major decisions, due consideration will be given to measures that minimize harm to the people and the nation.
+
+Respectfully,
+```
+
+## Key Points to Include (vary the wording each time):
+- Appreciation for US support of Iranian people's struggle for liberation
+- Deep concern about complete destruction of energy infrastructure
+- These infrastructures are national assets and foundation of livelihood for millions
+- Request for approach that minimizes long-term harm to civilians
+- Urge temporary and reversible disruption rather than total destruction
+- Reconstruction should be achievable at lowest cost and shortest timeframe
+- Complete destruction would cause extensive economic, social, humanitarian consequences
+- Would primarily affect suffering people of Iran and hinder recovery
+
+## Tone:
+- Respectful and diplomatic
+- Appreciative but firm
+- Focused on humanitarian concerns
+- Written entirely in English
+- Address to the Honorable President of United States
+"""
+
+
+def get_whitehouse_email_prompt():
+    """
+    Creates the prompt for generating a White House email about energy infrastructure.
+    Returns tuple of (subject_prompt, body_prompt)
+    """
+    subject_prompt = f"""
+{WHITEHOUSE_EMAIL_CONTEXT}
+
+## Your Task
+Generate ONE email subject line in English for this appeal.
+
+## Requirements:
+- Write in English
+- Keep it formal and respectful
+- About protecting Iran's energy infrastructure from complete destruction
+- Under 100 characters
+
+## CRITICAL: Output EXACTLY ONE subject line.
+- Do NOT output multiple options
+- Do NOT number anything
+- Do NOT include explanations
+- Just write ONE single subject line
+
+Output ONE subject line now:"""
+
+    body_prompt = f"""
+{WHITEHOUSE_EMAIL_CONTEXT}
+
+## Your Task
+Generate ONE SINGLE email body in English appealing to the US President regarding Iran's energy infrastructure.
+
+## Requirements:
+- Write entirely in English
+- Start with "To the Honorable President of United States,"
+- Be respectful, diplomatic, and appreciative
+- Include the key points but vary the wording from the template
+- Use formal, diplomatic language
+- About 200-350 words
+- End with "Respectfully,"
+- Express appreciation for US support AND concern about infrastructure destruction
+
+## CRITICAL - OUTPUT EXACTLY ONE EMAIL:
+- Do NOT output multiple emails or variations
+- Do NOT number anything (no "Email 1:", "Email 2:", etc.)
+- Do NOT include explanations or options
+- Just write ONE SINGLE email body
+
+## CRITICAL - NO PLACEHOLDERS:
+- Do NOT use any placeholders like <Name>, <Signature>, <Your Name>, etc.
+- The email must be READY TO SEND as-is, no editing needed
+- Do NOT include a name after "Respectfully," - just end with "Respectfully,"
+
+Write ONLY ONE email body in English (no quotes, no numbering, no explanations):"""
+
+    return subject_prompt, body_prompt
+
+
 # Smart Reply System Prompt - Harsh Roasting Style
 SMART_REPLY_SYSTEM_PROMPT = """تو یه ایرانی زبون‌دار و تیزی که توی توییتر روست میکنی. جواب‌هات باید سوزنده، خنده‌دار و کشنده باشه.
 

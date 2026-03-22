@@ -110,6 +110,9 @@ FINLAND_EMBASSY_EMAIL_TO = "ALA-02@gov.fi,ALA-03@gov.fi,int.dep@eduskunta.fi,ann
 # Sciences Po (Kevan Gafaïti) Email
 SCIENCESPO_EMAIL_TO = "accueil.enseignant@sciencespo.fr,media@sciencespo.fr,webmestre@sciencespo.fr,info@sciencespo-alumni.fr,integrite.scientifique@sciencespo.fr,claudine.lamaze@sciencespo.fr,marina.abelskaiagraziani@sciencespo.fr,benedicte.barbe@sciencespo.fr,vincent.morandi@sciencespo.fr,elsa.bedos@sciencespo.fr,helene.naudet@sciencespo.fr"
 
+# White House Email
+WHITEHOUSE_EMAIL_TO = "comments@whitehouse.gov"
+
 # France Foreign Ministry Email
 FRANCE_EMAIL_TO = "francois-xavier.bellamy@europarl.europa.eu,gregory.allione@europarl.europa.eu,mathilde.androuet@europarl.europa.eu,manon.aubry@europarl.europa.eu,jordan.bardella@europarl.europa.eu,nicolas.bay@europarl.europa.eu,christophe.bay@europarl.europa.eu,gilles.boyer@europarl.europa.eu,marie-luce.brasier-clain@europarl.europa.eu,melissa.camara@europarl.europa.eu,courrier.bruxelles-dfra@diplomatie.gouv.fr,presse.bruxelles-dfra@diplomatie.gouv.fr,mail.bruxelles-dfra@diplomatie.gouv.fr,rp.strasbourg-dfra@diplomatie.gouv.fr"
 
@@ -138,7 +141,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     keyboard = [
         [InlineKeyboardButton(UI["military_support_button"], callback_data="military_support_email")],
         [InlineKeyboardButton(UI["finland_embassy_button"], callback_data="finland_embassy_email")],
-        [InlineKeyboardButton(UI["sciencespo_button"], callback_data="sciencespo_email")],
+        [InlineKeyboardButton(UI["whitehouse_button"], callback_data="whitehouse_email")],
         [InlineKeyboardButton(UI["smart_reply_button"], callback_data="smart_reply")],
         [InlineKeyboardButton(UI["platforms"]["twitter"], callback_data="platform_twitter")],
         [InlineKeyboardButton(UI["platforms"]["instagram"], callback_data="platform_instagram")],
@@ -489,7 +492,7 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         keyboard = [
             [InlineKeyboardButton(UI["military_support_button"], callback_data="military_support_email")],
             [InlineKeyboardButton(UI["finland_embassy_button"], callback_data="finland_embassy_email")],
-            [InlineKeyboardButton(UI["sciencespo_button"], callback_data="sciencespo_email")],
+            [InlineKeyboardButton(UI["whitehouse_button"], callback_data="whitehouse_email")],
             [InlineKeyboardButton(UI["smart_reply_button"], callback_data="smart_reply")],
             [InlineKeyboardButton(UI["platforms"]["twitter"], callback_data="platform_twitter")],
             [InlineKeyboardButton(UI["platforms"]["instagram"], callback_data="platform_instagram")],
@@ -935,6 +938,52 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
             ]
             await query.edit_message_text(
                 f"{UI['finland_embassy_title']}\n\n"
+                f"❌ خطا در ساختن ایمیل. لطفاً دوباره تلاش کنید.",
+                reply_markup=InlineKeyboardMarkup(keyboard),
+            )
+
+    # White House Energy Infrastructure Email Campaign
+    elif data == "whitehouse_email":
+        await query.answer()
+        log_action(telegram_id=user.id, username=user.username, action="whitehouse_start", target_handle="")
+
+        await query.edit_message_text(
+            f"{UI['whitehouse_title']}\n\n"
+            f"{UI['whitehouse_situation']}\n\n"
+            f"{UI['whitehouse_generating']}"
+        )
+
+        try:
+            from ai_generator import generate_whitehouse_email
+            subject, body = generate_whitehouse_email()
+
+            log_action(telegram_id=user.id, username=user.username, action="whitehouse_email", target_handle=WHITEHOUSE_EMAIL_TO, language="en")
+
+            email_page_base = "https://aliemam.github.io/voice-for-iran/"
+            bcc_encoded = urllib.parse.quote(WHITEHOUSE_EMAIL_TO, safe='')
+            sub_encoded = urllib.parse.quote_plus(subject)
+            body_encoded = urllib.parse.quote_plus(body)
+            email_page_url = f"{email_page_base}?to=&bcc={bcc_encoded}&sub={sub_encoded}&body={body_encoded}"
+
+            keyboard = [
+                [InlineKeyboardButton("📧 ارسال ایمیل به کاخ سفید", url=email_page_url)],
+                [InlineKeyboardButton(UI["start_over"], callback_data="back_to_start")],
+            ]
+
+            await query.edit_message_text(
+                f"{UI['whitehouse_title']}\n\n"
+                f"{UI['whitehouse_email_explain']}\n\n"
+                "✅ ایمیل منحصربه‌فرد آماده است! روی دکمه زیر کلیک کنید:",
+                reply_markup=InlineKeyboardMarkup(keyboard),
+            )
+        except Exception as e:
+            logger.error(f"Error generating White House email: {e}")
+            keyboard = [
+                [InlineKeyboardButton("🔄 تلاش مجدد", callback_data="whitehouse_email")],
+                [InlineKeyboardButton(UI["start_over"], callback_data="back_to_start")],
+            ]
+            await query.edit_message_text(
+                f"{UI['whitehouse_title']}\n\n"
                 f"❌ خطا در ساختن ایمیل. لطفاً دوباره تلاش کنید.",
                 reply_markup=InlineKeyboardMarkup(keyboard),
             )
