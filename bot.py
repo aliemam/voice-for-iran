@@ -142,8 +142,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         [InlineKeyboardButton(UI["finland_embassy_button"], callback_data="finland_embassy_email")],
         [InlineKeyboardButton(UI["whitehouse_button"], callback_data="whitehouse_email")],
         [InlineKeyboardButton(UI["smart_reply_button"], callback_data="smart_reply")],
-        [InlineKeyboardButton(UI["platforms"]["twitter"], callback_data="platform_twitter")],
-        [InlineKeyboardButton(UI["platforms"]["instagram"], callback_data="platform_instagram")],
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
@@ -492,8 +490,6 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
             [InlineKeyboardButton(UI["finland_embassy_button"], callback_data="finland_embassy_email")],
             [InlineKeyboardButton(UI["whitehouse_button"], callback_data="whitehouse_email")],
             [InlineKeyboardButton(UI["smart_reply_button"], callback_data="smart_reply")],
-            [InlineKeyboardButton(UI["platforms"]["twitter"], callback_data="platform_twitter")],
-            [InlineKeyboardButton(UI["platforms"]["instagram"], callback_data="platform_instagram")],
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
 
