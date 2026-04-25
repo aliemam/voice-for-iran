@@ -8,8 +8,8 @@ BOT_TOKEN = os.getenv("BOT_TOKEN")
 
 # Anthropic
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
-CLAUDE_MODEL = "claude-3-haiku-20240307"
-CLAUDE_MODEL_SMART = "claude-opus-4-20250514"  # Smartest model for roasting
+CLAUDE_MODEL = "claude-haiku-4-5-20251001"
+CLAUDE_MODEL_SMART = "claude-haiku-4-5-20251001"  # Same cheap Haiku — text-gen task doesn't need Opus
 
 # Database
 DB_PATH = os.path.join(os.path.dirname(__file__), "data", "usage.db")
