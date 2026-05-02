@@ -6,7 +6,7 @@ Generates unique, personalized messages for social media.
 import re
 import anthropic
 from config import ANTHROPIC_API_KEY, CLAUDE_MODEL, CLAUDE_MODEL_SMART
-from templates import get_system_prompt, get_generation_prompt, get_trump_senator_prompt, get_finland_email_prompt, get_denmark_email_prompt, get_yle_email_prompt, get_yle_tweet_prompt, SMART_REPLY_SYSTEM_PROMPT, get_smart_reply_prompt, get_sciencespo_email_prompt, get_france_email_prompt, get_spain_email_prompt, get_finland_embassy_email_prompt, get_military_support_email_prompt, get_whitehouse_email_prompt
+from templates import get_system_prompt, get_generation_prompt, get_trump_senator_prompt, get_finland_email_prompt, get_denmark_email_prompt, get_yle_email_prompt, get_yle_tweet_prompt, SMART_REPLY_SYSTEM_PROMPT, get_smart_reply_prompt, get_sciencespo_email_prompt, get_france_email_prompt, get_spain_email_prompt, get_finland_embassy_email_prompt, get_military_support_email_prompt, get_whitehouse_email_prompt, get_jsn_email_prompt
 
 
 class MessageGenerator:
@@ -729,6 +729,67 @@ Write only in English. Be respectful, appreciative, and diplomatic."""
         raise Exception(f"API Error: {str(e)}")
     except Exception as e:
         raise Exception(f"Error generating White House email: {str(e)}")
+
+
+def generate_jsn_email() -> tuple:
+    """
+    Generates a unique appeal email (subject and body) in Finnish to the
+    Finnish Council for Mass Media (Julkisen sanan neuvosto, JSN).
+
+    Returns:
+        Tuple of (subject, body) - both in Finnish
+    """
+    generator = get_generator()
+    subject_prompt, body_prompt = get_jsn_email_prompt()
+
+    system_prompt = """You are helping generate a formal open letter in Finnish to the Finnish Council for Mass Media (Julkisen sanan neuvosto).
+Your role is to create unique, morally serious, respectful but firm appeals about the silence of Finnish media on the human-rights crisis in Iran.
+Each email must be unique - vary the wording while keeping the same core message.
+Write only in Finnish. Be formal, dignified, and principled."""
+
+    try:
+        # Generate subject
+        subject_response = generator.client.messages.create(
+            model=generator.model,
+            max_tokens=100,
+            system=system_prompt,
+            messages=[{"role": "user", "content": subject_prompt}],
+        )
+        subject = subject_response.content[0].text.strip()
+
+        if subject.startswith('"') and subject.endswith('"'):
+            subject = subject[1:-1]
+        if '\n' in subject:
+            subject = subject.split('\n')[0]
+        subject = re.sub(r'^\d+[\.\)]\s*', '', subject)
+        subject = re.sub(r'^(Aihe|Asia|Otsikko):\s*', '', subject, flags=re.IGNORECASE)
+
+        # Generate body
+        body_response = generator.client.messages.create(
+            model=generator.model,
+            max_tokens=1500,
+            system=system_prompt,
+            messages=[{"role": "user", "content": body_prompt}],
+        )
+        body = body_response.content[0].text.strip()
+
+        if body.startswith('"') and body.endswith('"'):
+            body = body[1:-1]
+
+        for pattern in ['Email 2:', 'Email 3:', 'Sähköposti 2:', 'Sähköposti 3:', 'E-mail 2:', '\n---\n', '\n\n---']:
+            if pattern in body:
+                body = body.split(pattern)[0].strip()
+
+        body = re.sub(r'^Email\s*\d+:\s*\n?', '', body, flags=re.IGNORECASE)
+        body = re.sub(r'^Sähköposti\s*\d+:\s*\n?', '', body, flags=re.IGNORECASE)
+        body = re.sub(r'^E-mail\s*\d+:\s*\n?', '', body, flags=re.IGNORECASE)
+
+        return subject, body
+
+    except anthropic.APIError as e:
+        raise Exception(f"API Error: {str(e)}")
+    except Exception as e:
+        raise Exception(f"Error generating JSN email: {str(e)}")
 
 
 def generate_smart_reply(tweet_text: str, username: str = None, rejected_replies: list = None) -> str:

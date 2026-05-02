@@ -113,6 +113,9 @@ SCIENCESPO_EMAIL_TO = "accueil.enseignant@sciencespo.fr,media@sciencespo.fr,webm
 # White House Email
 WHITEHOUSE_EMAIL_TO = "comments@whitehouse.gov"
 
+# JSN (Julkisen sanan neuvosto - Finnish Council for Mass Media) Email
+JSN_EMAIL_TO = "Eero.Hyvonen@jsn.fi,Susan.Heikkinen@jsn.fi,Jukka.Hiiro@jsn.fi,Laura.Juntunen@jsn.fi"
+
 # France Foreign Ministry Email
 FRANCE_EMAIL_TO = "francois-xavier.bellamy@europarl.europa.eu,gregory.allione@europarl.europa.eu,mathilde.androuet@europarl.europa.eu,manon.aubry@europarl.europa.eu,jordan.bardella@europarl.europa.eu,nicolas.bay@europarl.europa.eu,christophe.bay@europarl.europa.eu,gilles.boyer@europarl.europa.eu,marie-luce.brasier-clain@europarl.europa.eu,melissa.camara@europarl.europa.eu,courrier.bruxelles-dfra@diplomatie.gouv.fr,presse.bruxelles-dfra@diplomatie.gouv.fr,mail.bruxelles-dfra@diplomatie.gouv.fr,rp.strasbourg-dfra@diplomatie.gouv.fr"
 
@@ -139,8 +142,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     )
 
     keyboard = [
-        [InlineKeyboardButton(UI["finland_embassy_button"], callback_data="finland_embassy_email")],
-        [InlineKeyboardButton(UI["whitehouse_button"], callback_data="whitehouse_email")],
+        [InlineKeyboardButton(UI["jsn_button"], callback_data="jsn_email")],
         [InlineKeyboardButton(UI["smart_reply_button"], callback_data="smart_reply")],
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
@@ -487,8 +489,7 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         context.user_data["selected_targets"] = []
 
         keyboard = [
-            [InlineKeyboardButton(UI["finland_embassy_button"], callback_data="finland_embassy_email")],
-            [InlineKeyboardButton(UI["whitehouse_button"], callback_data="whitehouse_email")],
+            [InlineKeyboardButton(UI["jsn_button"], callback_data="jsn_email")],
             [InlineKeyboardButton(UI["smart_reply_button"], callback_data="smart_reply")],
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
@@ -978,6 +979,52 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
             ]
             await query.edit_message_text(
                 f"{UI['whitehouse_title']}\n\n"
+                f"❌ خطا در ساختن ایمیل. لطفاً دوباره تلاش کنید.",
+                reply_markup=InlineKeyboardMarkup(keyboard),
+            )
+
+    # JSN (Finnish Council for Mass Media) Email Campaign
+    elif data == "jsn_email":
+        await query.answer()
+        log_action(telegram_id=user.id, username=user.username, action="jsn_start", target_handle="")
+
+        await query.edit_message_text(
+            f"{UI['jsn_title']}\n\n"
+            f"{UI['jsn_situation']}\n\n"
+            f"{UI['jsn_generating']}"
+        )
+
+        try:
+            from ai_generator import generate_jsn_email
+            subject, body = generate_jsn_email()
+
+            log_action(telegram_id=user.id, username=user.username, action="jsn_email", target_handle=JSN_EMAIL_TO, language="fi")
+
+            email_page_base = "https://aliemam.github.io/voice-for-iran/"
+            bcc_encoded = urllib.parse.quote(JSN_EMAIL_TO, safe='')
+            sub_encoded = urllib.parse.quote_plus(subject)
+            body_encoded = urllib.parse.quote_plus(body)
+            email_page_url = f"{email_page_base}?to=&bcc={bcc_encoded}&sub={sub_encoded}&body={body_encoded}"
+
+            keyboard = [
+                [InlineKeyboardButton("📧 ارسال ایمیل به JSN", url=email_page_url)],
+                [InlineKeyboardButton(UI["start_over"], callback_data="back_to_start")],
+            ]
+
+            await query.edit_message_text(
+                f"{UI['jsn_title']}\n\n"
+                f"{UI['jsn_email_explain']}\n\n"
+                "✅ ایمیل منحصربه‌فرد آماده است! روی دکمه زیر کلیک کنید:",
+                reply_markup=InlineKeyboardMarkup(keyboard),
+            )
+        except Exception as e:
+            logger.error(f"Error generating JSN email: {e}")
+            keyboard = [
+                [InlineKeyboardButton("🔄 تلاش مجدد", callback_data="jsn_email")],
+                [InlineKeyboardButton(UI["start_over"], callback_data="back_to_start")],
+            ]
+            await query.edit_message_text(
+                f"{UI['jsn_title']}\n\n"
                 f"❌ خطا در ساختن ایمیل. لطفاً دوباره تلاش کنید.",
                 reply_markup=InlineKeyboardMarkup(keyboard),
             )

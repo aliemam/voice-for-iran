@@ -1209,6 +1209,113 @@ Write ONLY ONE email body in English (no quotes, no numbering, no explanations):
     return subject_prompt, body_prompt
 
 
+# JSN (Julkisen sanan neuvosto - Finnish Council for Mass Media) Email Template
+JSN_EMAIL_CONTEXT = """
+## Context: Appeal to the Finnish Council for Mass Media (JSN)
+
+An open letter from Iranian-Finnish citizens to the leadership of Julkisen sanan neuvosto (JSN) — the self-regulatory body of the Finnish media — protesting the silence and insufficient coverage of the ongoing human-rights catastrophe in Iran by Finnish media outlets.
+
+The Iranian regime has imposed a near-total internet blackout and is killing peaceful protesters in the streets. Tens of thousands have been detained or wounded; reports place the dead in the tens of thousands. Yet Finnish mainstream media has, to a significant extent, ignored or under-covered these events, despite Finland's stated commitment to human rights and a free press.
+
+The recipients are the JSN chair and rapporteurs. The letter is a moral and professional appeal — not a complaint about a specific article — asking the council to encourage Finnish media to cover Iran with the same independence, courage, and depth that the Finnish public expects of its journalism.
+
+## Base Template (use as reference, vary the wording each time - WRITE IN FINNISH):
+```
+Arvoisat Suomen tiedotusvälineet,
+
+Kirjoitan tämän kirjeen syvän huolen ja pettymyksen vallassa teidän hiljaisuutenne vuoksi Iranissa tapahtuvien vakavien ihmisoikeusloukkausten edessä. Samalla kun maailmanlaajuisesti korostetaan oikeudenmukaisuutta, demokratiaa ja ihmisoikeuksia, Iranin kansa kohtaa sortoa, väkivaltaa ja perusoikeuksiensa polkemista. Nämä todellisuudet eivät kuitenkaan usein saa riittävää näkyvyyttä Suomessa toimivissa, näennäisesti riippumattomissa tiedotusvälineissä.
+
+Tiedotusvälineiden rooli totuuden välittäjänä ja äänettömien äänenä on keskeinen ja elintärkeä. Tällaisissa olosuhteissa tarvitaan enemmän kuin koskaan riippumatonta, rohkeaa ja vastuullista journalismia, joka tuo esiin ne tosiasiat, jotka muuten saattaisivat jäädä varjoon. Hiljaisuus tai vähäinen huomio voidaan meidän iranilaistaustaisten kansalaisten keskuudessa tulkita välinpitämättömyydeksi tai jopa hiljaiseksi hyväksynnäksi.
+
+Iranin kansa ei vaadi enempää kuin perustavanlaatuisia ihmisoikeuksiaan: vapautta, ihmisarvoa ja oikeutta elää ilman pelkoa. Teillä, suomalaisina vaikutusvaltaisina tiedotusvälineinä, on merkittävä rooli yleisen tietoisuuden muovaamisessa. Siksi odotamme teiltä suurempaa vastuunkantoa sekä laajempaa ja syvällisempää huomiota Iranin tilanteeseen niin uutisoinnin kuin analyysin ja keskustelun tasolla.
+
+Tämä ei ole pelkästään poliittinen kysymys, vaan inhimillinen velvollisuus. Toivon, että tulevaisuudessa näemme teiltä aktiivisemman ja tasapainoisemman lähestymistavan Iranin tapahtumiin sellaisen, joka heijastaa tilanteen vakavuutta ja antaa äänen niille, joilta se on riistetty.
+
+On selvää, että iranilaiset tulevat suurin ponnistuksin ja uhrauksin kaatamaan nykyisen rikollisen hallinnon ja luomaan edellytykset järjestelmälle, joka perustuu inhimillisiin arvoihin ja demokratiaan. Me iranilais-suomalaiset kansalaiset vaadimme tiedotusvälineiltä vahvaa tukea Iranin todellisen tilanteen esiin tuomisessa.
+
+Hallinto, joka katkaisemalla kaikki yhteydet ulkomaailmaan syyllistyy rikoksiin ja teloittaa ihmisoikeuksiensa puolesta protestoivia, ei saa kohdata kaksinaismoralistista suhtautumista. Tällainen kaksinkertainen standardi ei ole meille hyväksyttävä eikä perusteltavissa.
+
+Iranilaiset uhraavat henkensä tavoitellakseen samoja arvoja, joiden puolustamista te itse korostatte. Siksi kehotamme teitä pysymään uskollisina riippumattoman median todelliselle tehtävälle ja tarkistamaan kantojanne vakavasti.
+
+Kunnioittavasti
+```
+
+## Key Points to Include (vary the wording each time - WRITE IN FINNISH):
+- Disappointment and concern about the silence/under-coverage of Iran by Finnish media
+- The role of media as the voice of the voiceless and a deliverer of truth
+- Need for independent, courageous, responsible journalism precisely in moments like these
+- Silence can be interpreted by Iranian-Finnish citizens as indifference or quiet acceptance
+- Iranians are asking only for fundamental human rights: freedom, dignity, life without fear
+- Call for more responsibility, broader and deeper coverage — news, analysis, and debate
+- This is a human duty, not merely a political matter
+- The Iranian regime cuts off the world and executes protesters — must not be met with double standards
+- Iranian-Finnish citizens demand strong support from the media in surfacing the truth
+- End respectfully ("Kunnioittavasti")
+
+## Tone:
+- Formal, respectful, but firm and morally serious
+- The voice of an Iranian-Finnish citizen addressing the conscience of the Finnish press
+- Not a personal grievance — a principled public appeal
+- Written entirely in Finnish
+"""
+
+
+def get_jsn_email_prompt():
+    """
+    Creates the prompt for generating a JSN (Finnish Media Council) appeal email.
+    Returns tuple of (subject_prompt, body_prompt)
+    """
+    subject_prompt = f"""
+{JSN_EMAIL_CONTEXT}
+
+## Your Task
+Generate ONE email subject line in Finnish for this appeal to Finnish media.
+
+## Requirements:
+- Write in Finnish
+- Formal, serious tone — a moral appeal to the press
+- About the silence of Finnish media on the human-rights crisis in Iran
+- Under 100 characters
+- Examples of acceptable framing: "Vetoomus suomalaiselle medialle Iranin tilanteen kattavammasta uutisoinnista" or "Avoin kirje Suomen tiedotusvälineille Iranin ihmisoikeustilanteesta"
+
+## CRITICAL: Output EXACTLY ONE subject line.
+- Do NOT output multiple options
+- Do NOT number anything
+- Do NOT include explanations
+- Just write ONE single subject line in Finnish
+
+Output ONE subject line now:"""
+
+    body_prompt = f"""
+{JSN_EMAIL_CONTEXT}
+
+## Your Task
+Generate ONE SINGLE email body in Finnish addressed to Finnish media (the salutation MUST be "Arvoisat Suomen tiedotusvälineet,").
+
+## Requirements:
+- Write entirely in Finnish
+- Be formal, respectful, but morally firm
+- Include the key points but vary the wording from the template
+- About 350-500 words
+- Begin with "Arvoisat Suomen tiedotusvälineet,"
+- End with "Kunnioittavasti" on its own line (no name after it)
+
+## CRITICAL - OUTPUT EXACTLY ONE EMAIL:
+- Do NOT output multiple emails or variations
+- Do NOT number anything (no "Email 1:", "Email 2:", "Sähköposti 1:", etc.)
+- Do NOT include explanations, alternatives, or options
+- Just write ONE SINGLE email body
+
+## CRITICAL - NO PLACEHOLDERS:
+- Do NOT use placeholders like <Name>, <Nimi>, <Signature>, <Allekirjoitus>, etc.
+- The email must be READY TO SEND as-is
+- Do NOT add a name after "Kunnioittavasti" — the sender will add their own
+
+Write ONLY ONE email body in Finnish (no quotes, no numbering, no explanations):"""
+
+    return subject_prompt, body_prompt
+
+
 # Smart Reply System Prompt - Harsh Roasting Style
 SMART_REPLY_SYSTEM_PROMPT = """تو یه ایرانی زبون‌دار و تیزی که توی توییتر روست میکنی. جواب‌هات باید سوزنده، خنده‌دار و کشنده باشه.
 
